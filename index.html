@@ -1,4 +1,15 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#08080a">
+<meta name="description" content="Scala il 2026: climber verticale. Sali di appiglio in appiglio e conta i metri.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Scala il 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:wght@500;600;700&display=swap">
 <style>
@@ -15,7 +26,7 @@
     --red:#d14a2e;
   }
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0}
+  html,body{height:100%;margin:0;padding:0;overscroll-behavior:none}
   body{
     background:var(--void);
     color:var(--bone);
@@ -136,6 +147,8 @@
     .toast.show{animation-duration:.01s}
   }
 </style>
+</head>
+<body>
 
 <div class="stage" id="stage">
   <canvas id="game"></canvas>
@@ -190,21 +203,37 @@
 
   var REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- viewport virtuale ---------- */
-  var W = 450, H = 800, SC = 1;
+  /* ---------- viewport virtuale ----------
+     L'altezza visibile del mondo resta costante (~TARGET_H unita) su ogni
+     schermo: cosi il personaggio e le prese hanno sempre la stessa dimensione
+     apparente, che il telefono sia stretto e lungo o largo e corto. */
+  var TARGET_H = 660;
+  var W = 380, H = 660, SC = 1;
   function resize(){
     var r = stage.getBoundingClientRect();
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    H = Math.round(W * r.height / Math.max(1, r.width));
+    var aspect = Math.max(1, r.height) / Math.max(1, r.width);
+    var oldW = W;
+    W = Math.round(Math.min(470, Math.max(300, TARGET_H / aspect)));
+    H = Math.round(W * aspect);
     cvs.width  = Math.round(r.width * dpr);
     cvs.height = Math.round(r.height * dpr);
     SC = cvs.width / W;
+    // dopo una rotazione le prese devono restare dentro la parete
+    if (holds && oldW !== W){
+      var k = W / oldW;
+      for (var i=0;i<holds.length;i++){
+        holds[i].x = Math.min(W - holds[i].w - 4, Math.max(4, holds[i].x * k));
+      }
+      if (player) player.x = Math.min(W - 6, Math.max(6, player.x * k));
+    }
   }
   window.addEventListener('resize', resize);
+  window.addEventListener('orientationchange', resize);
 
   /* ---------- costanti ---------- */
   var G = 0.52, JUMP = -14.2, CHALK = -21.5;
-  var ACC = 0.85, FRIC = 0.86, VMAX = 6.4;
+  var ACC = 0.80, FRIC = 0.86, VMAX = 5.6;
   var PW = 46, PH = 66;
   var SEG = 430;
   var DIGITS = ['2','0','2','6'];
@@ -242,7 +271,7 @@
   function spawnRow(y, diff){
     var gap = rnd(74, 96) + diff*28;
     y -= gap;
-    var w = Math.round(rnd(66, 84) - diff*20);
+    var w = Math.round(W * (rnd(0.19, 0.245) - diff*0.055));
     var t = 'solid';
     var r = Math.random();
     if (solidStreak >= 2){
@@ -252,7 +281,7 @@
       else if (r < .32 + diff*.36 && diff > .18) t = 'grease';
     }
     if (t === 'solid') solidStreak++; else solidStreak = 0;
-    if (t === 'chalk') w = 54;
+    if (t === 'chalk') w = Math.round(W * 0.165);
     var x = rnd(6, W - w - 6);
     holds.push(mk(x, y, w, t));
     return y;
@@ -263,7 +292,8 @@
     player = { x:W/2, y:0, vx:0, vy:JUMP, face:1, stun:0, hi:0 };
     holds = []; rocks = []; bits = [];
     score = 0; shake = 0; milestone = 0; nextRock = 140; solidStreak = 0;
-    holds.push(mk(W/2 - 45, 40, 90, 'solid'));
+    var sw = Math.round(W * 0.30);
+    holds.push(mk(Math.round(W/2 - sw/2), 40, sw, 'solid'));
     var y = 40;
     while (y > cam - H*0.6) y = spawnRow(y, 0);
     topGen = y;
@@ -517,7 +547,7 @@
       var ch = DIGITS[((i % 4) + 4) % 4];
       var cy = i*SEG + SEG/2 - cam;
       var wd = ctx.measureText(ch).width || fs*0.6;
-      var k  = Math.min(1, (W*0.88) / wd);
+      var k  = Math.min(1.2, (W*0.88) / wd);
 
       ctx.save();
       ctx.translate(W/2, cy);
@@ -753,3 +783,6 @@
   else boot();
 })();
 </script>
+
+</body>
+</html>
