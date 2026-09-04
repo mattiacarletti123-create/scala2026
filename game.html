@@ -253,6 +253,18 @@
   /* ---------- costanti ---------- */
   var G = 0.52, JUMP = -14.2, CHALK = -21.5;
   var ACC = 0.80, FRIC = 0.86, VMAX = 5.6;
+
+  /* Portata del salto: da un appoggio il rimbalzo vale JUMP, quindi la quota
+     massima guadagnata e JUMP^2 / (2*G), circa 194px. Serve per generare solo
+     pareti effettivamente scalabili: vedi GAP_UNTA. */
+  var REACH = (JUMP*JUMP) / (2*G);
+  /* Sulla presa unta la mano scivola e il rimbalzo non c'e: per ripartire
+     bisogna coprire in un colpo solo il dislivello dell'unta piu quello della
+     presa successiva. Ogni riga ha un solo appoggio, quindi se quella somma
+     supera la portata non esistono vie alternative e si resta bloccati sotto.
+     Attorno all'unta le prese si infittiscono per stare dentro la portata,
+     con un margine del 14 per cento per l'errore di mira. */
+  var GAP_UNTA = Math.floor(REACH * 0.86 / 2);
   var PW = 46, PH = 66;
   var SEG = 430;
   var DIGITS = ['2','0','2','6'];
@@ -268,7 +280,7 @@
   /* ---------- stato ---------- */
   var state = 'ready';
   var player, holds, rocks, bits, cam, topGen, score = 0, shake = 0, nextRock = 0, milestone = 0;
-  var best = 0, solidStreak = 0, appoggi = 0, cheerIdx = 0;
+  var best = 0, solidStreak = 0, appoggi = 0, cheerIdx = 0, untaPrec = false;
 
   try { best = parseInt(localStorage.getItem('scala2026') || '0', 10) || 0; } catch(e){ best = 0; }
   if (!isFinite(best)) best = 0;
@@ -288,9 +300,6 @@
   }
 
   function spawnRow(y, diff){
-    var gap = rnd(74, 96) + diff*28;
-    y -= gap;
-    var w = Math.round(W * (rnd(0.19, 0.245) - diff*0.055));
     var t = 'solid';
     var r = Math.random();
     if (solidStreak >= 2){
@@ -299,6 +308,14 @@
       else if (r < .27 + diff*.26) t = 'move';
       else if (r < .32 + diff*.36 && diff > .18) t = 'grease';
     }
+
+    var gap = rnd(74, 96) + diff*28;
+    // l'unta e la presa subito sopra vanno saltate con un rimbalzo solo
+    if (t === 'grease' || untaPrec) gap = Math.min(gap, GAP_UNTA);
+    untaPrec = (t === 'grease');
+    y -= gap;
+
+    var w = Math.round(W * (rnd(0.19, 0.245) - diff*0.055));
     if (t === 'solid') solidStreak++; else solidStreak = 0;
     if (t === 'chalk') w = Math.round(W * 0.165);
     var x = rnd(6, W - w - 6);
@@ -311,7 +328,7 @@
     player = { x:W/2, y:0, vx:0, vy:JUMP, face:1, stun:0, hi:0 };
     holds = []; rocks = []; bits = [];
     score = 0; shake = 0; milestone = 0; nextRock = 140; solidStreak = 0;
-    appoggi = 0; cheerIdx = 0;
+    appoggi = 0; cheerIdx = 0; untaPrec = false;
     var sw = Math.round(W * 0.30);
     holds.push(mk(Math.round(W/2 - sw/2), 40, sw, 'solid'));
     var y = 40;
