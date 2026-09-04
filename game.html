@@ -281,6 +281,7 @@
   var state = 'ready';
   var player, holds, rocks, bits, cam, topGen, score = 0, shake = 0, nextRock = 0, milestone = 0;
   var best = 0, solidStreak = 0, appoggi = 0, cheerIdx = 0, untaPrec = false;
+  var ancora = null;   // ultima presa da cui si puo spingere: riferimento per la verifica
 
   try { best = parseInt(localStorage.getItem('scala2026') || '0', 10) || 0; } catch(e){ best = 0; }
   if (!isFinite(best)) best = 0;
@@ -289,14 +290,61 @@
   function rnd(a,b){ return a + Math.random()*(b-a); }
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
 
-  function mk(x,y,w,type){
+  function mk(x,y,w,type,spd){
     var pal = type === 'solid' ? COL.solid[(Math.random()*COL.solid.length)|0] : COL[type];
     return {
       x:x, y:y, w:w, h:15, type:type, dead:0,
       f:pal[0], d:pal[1],
       dir: Math.random() < .5 ? -1 : 1,
-      spd: rnd(0.9, 2.1)
+      spd: spd
     };
+  }
+
+  /* ---------- garanzia di scalabilita' ----------------------------------
+     C'e un solo appoggio per riga, quindi non esistono percorsi alternativi:
+     una presa fuori portata non uccide il giocatore, lo intrappola a
+     rimbalzare sotto all'infinito. Il salto e alto 194px ma il tempo di volo
+     e poco piu di 40 fotogrammi, e in quel tempo lo spostamento laterale
+     possibile e limitato: capita quindi che una presa sia sopra ma troppo di
+     lato. Invece di stimarlo con una formula, ogni presa nuova viene provata
+     con la fisica vera; se non ci si arriva viene avvicinata a quella di
+     partenza e riprovata. Il collaudatore e volutamente pessimista: parte
+     dalle due estremita dell'appoggio, con la spinta laterale contraria, e
+     con la presa mobile che scappa in entrambi i versi.                    */
+  var DAMP = 0.35;   // afferrando la presa la spinta laterale si smorza
+
+  function arriva(da, y, x, w, tipo, spd, vx0, off, dirM){
+    var px = da.x + da.w/2 + off*da.w, vx = vx0, py = da.y, vy = JUMP;
+    var bx = x, bd = dirM;
+    for (var f=0; f<220; f++){
+      var d = bx + w/2 - px;
+      var giro = d > 0 ? d - (W + PW) : d + (W + PW);   // passando da un bordo all'altro
+      if (Math.abs(giro) < Math.abs(d)) d = giro;
+      if (Math.abs(d) > 1.5) vx += d > 0 ? ACC : -ACC; else vx *= FRIC;
+      vx = clamp(vx, -VMAX, VMAX);
+      var prev = py;
+      px += vx; vy += G; py += vy;
+      if (px < -PW/2) px = W + PW/2;
+      if (px > W + PW/2) px = -PW/2;
+      if (tipo === 'move'){
+        bx += bd * spd;
+        if (bx < 4){ bx = 4; bd = 1; }
+        if (bx + w > W - 4){ bx = W - 4 - w; bd = -1; }
+      }
+      if (vy > 0 && prev <= y && py >= y)
+        return px + PW*0.34 > bx && px - PW*0.34 < bx + w;
+      if (py > da.y + 40) return false;   // ricaduto sotto la partenza
+    }
+    return false;
+  }
+
+  function raggiungibile(da, y, x, w, tipo, spd){
+    var v = VMAX * DAMP;
+    for (var a=-1; a<=1; a++)
+      for (var o=-1; o<=1; o+=2)
+        for (var m=-1; m<=1; m+=2)
+          if (!arriva(da, y, x, w, tipo, spd, a*v, o*0.4, m)) return false;
+    return true;
   }
 
   function spawnRow(y, diff){
@@ -318,8 +366,26 @@
     var w = Math.round(W * (rnd(0.19, 0.245) - diff*0.055));
     if (t === 'solid') solidStreak++; else solidStreak = 0;
     if (t === 'chalk') w = Math.round(W * 0.165);
+
+    var spd = rnd(0.9, 2.1);
     var x = rnd(6, W - w - 6);
-    holds.push(mk(x, y, w, t));
+
+    /* Sull'unta non si rimbalza: non e un bersaglio, si piazza dove capita e
+       l'ancora resta quella sotto, cosi la riga seguente viene verificata
+       sul salto lungo che dovra davvero essere fatto. */
+    if (t !== 'grease' && ancora){
+      var c0 = ancora.x + ancora.w/2;
+      var ok = false;
+      for (var tent = 0; tent < 7; tent++){
+        if (raggiungibile(ancora, y, x, w, t, spd)){ ok = true; break; }
+        x = clamp(c0 + (x + w/2 - c0)*0.6 - w/2, 6, W - w - 6);   // avvicina e riprova
+      }
+      if (!ok) x = clamp(c0 - w/2, 6, W - w - 6);                 // in verticale si arriva sempre
+    }
+
+    var h = mk(x, y, w, t, spd);
+    holds.push(h);
+    if (t !== 'grease') ancora = h;
     return y;
   }
 
@@ -330,7 +396,8 @@
     score = 0; shake = 0; milestone = 0; nextRock = 140; solidStreak = 0;
     appoggi = 0; cheerIdx = 0; untaPrec = false;
     var sw = Math.round(W * 0.30);
-    holds.push(mk(Math.round(W/2 - sw/2), 40, sw, 'solid'));
+    ancora = mk(Math.round(W/2 - sw/2), 40, sw, 'solid', 1.5);
+    holds.push(ancora);
     var y = 40;
     while (y > cam - H*0.6) y = spawnRow(y, 0);
     topGen = y;
@@ -549,6 +616,11 @@
           tone(140, .12, 'sawtooth', .03);
           continue;
         }
+        // afferrando la presa lo slancio laterale si smorza: senza questo si
+        // riparte gia lanciati nel verso sbagliato e la presa dopo diventa
+        // irraggiungibile. Stesso valore usato dalla verifica in spawnRow.
+        player.vx *= DAMP;
+
         if (h.type === 'chalk'){
           player.vy = CHALK;
           puff(player.x, h.y, 16, '242,239,230', 2.6);
