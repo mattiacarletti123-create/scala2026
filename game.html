@@ -1090,22 +1090,32 @@
 
   function hash(n){ var s = Math.sin(n*127.1)*43758.5453; return s - Math.floor(s); }
 
-  /* Le foto dei mondi si chiedono una alla volta. Su rete debole si riprova un
-     paio di volte e poi si lascia la fascia neutra, invece di insistere a ogni
-     fotogramma. */
+  /* Le foto dei mondi si chiedono una alla volta, e si cercano in due posti:
+     prima nella cartella mondi/, poi accanto al gioco. Serve perche su GitHub
+     i file trascinati singolarmente finiscono nella radice mentre la cartella
+     trascinata intera conserva il percorso: cosi il gioco funziona in
+     entrambi i casi, senza dover rifare il caricamento.
+     Esaurite le due posizioni si riprova un paio di volte per le reti lente,
+     poi si lascia la fascia neutra invece di insistere a ogni fotogramma. */
   var mondoImg = [];
+  function pathMondo(k, tent){
+    return (tent === 1 ? 'mondi/' : '') + MONDI[k] + '.jpg';
+  }
   function caricaMondo(k){
     k = ((k % MONDI.length) + MONDI.length) % MONDI.length;
     if (mondoImg[k]) return;
     var m = mondoImg[k] = { img: new Image(), ok: false, tent: 1 };
     m.img.onload  = function(){ m.ok = true; };
     m.img.onerror = function(){
-      if (m.tent < 3){
-        m.tent++;
-        setTimeout(function(){ m.img.src = 'mondi/' + MONDI[k] + '.jpg?r=' + m.tent; }, 4000);
-      }
+      if (m.tent >= 4) return;
+      m.tent++;
+      // il cambio di posizione va provato subito, i ritentativi dopo una pausa
+      var attesa = m.tent === 2 ? 0 : 4000;
+      setTimeout(function(){
+        m.img.src = pathMondo(k, m.tent) + (m.tent > 2 ? '?r=' + m.tent : '');
+      }, attesa);
     };
-    m.img.src = 'mondi/' + MONDI[k] + '.jpg';
+    m.img.src = pathMondo(k, 1);
   }
 
   /* I bulloni sulla roccia: stessa mano su tutte le fasce, disposti da hash()
