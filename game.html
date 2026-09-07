@@ -360,10 +360,15 @@
   /* Mostri: entrano oltre i MOSTRO_DA metri, traversano la parete e scendono
      piano incontro al giocatore. Il contatto e letale, un colpo li dissolve. */
   var MOSTRO_DA = 380, MOSTRO_R = 13;
-  /* Ampiezza del dondolio orizzontale, in unita di mondo per lato: su una
-     parete larga circa 380 sono pochi punti percentuali, un'oscillazione
-     appena percettibile. Alzalo per farli spaziare di piu. */
-  var MOSTRO_AMP = 16;
+  /* Le due manopole del movimento, entrambe volutamente piccole: il mostro
+     presidia il suo pezzo di parete e non si sposta da li.
+     MOSTRO_AMP = quanto dondola di lato, in unita di mondo per lato (la parete
+     e larga circa 380). MOSTRO_VY = quanto scende per fotogramma: a 0.12 sono
+     7 unita al secondo, cioe' un'inerzia appena visibile invece della discesa
+     che prima gli faceva attraversare tutta l'altezza dello schermo. Metti 0
+     per inchiodarli del tutto. */
+  var MOSTRO_AMP = 10;
+  var MOSTRO_VY = 0.12;
 
   /* Ali d'angelo: fotogrammi del rientro dopo una vita spesa. In questo tempo
      il personaggio e intoccabile, cosi non muore due volte nello stesso punto. */
@@ -941,7 +946,7 @@
         mostri.push({
           x: mx0, x0: mx0, amp: amp,
           y: cam - 50,
-          vy: 0.45 + diff*0.75,
+          vy: MOSTRO_VY,
           t: Math.random()*6.2832
         });
       }
