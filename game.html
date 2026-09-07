@@ -387,7 +387,30 @@
   var GAP_UNTA = Math.floor(REACH * 0.86 / 2);
   var PW = 46, PH = 66;
   var SEG = 430;
-  var DIGITS = ['2','0','2','6'];
+  /* Le cifre in ordine di salita: dal basso si incontrano 6, 2, 0, 2, cosi
+     lette dall'alto verso il basso compongono 2026. */
+  var CIFRE = ['6','2','0','2'];
+
+  /* ---------- i mondi ----------
+     Passata la parete del 2026 la salita attraversa i marchi del gruppo, una
+     fascia per marchio, nell'ordine in cui si incontrano salendo. Dopo
+     l'ultima il ciclo riparte dal 2026.
+
+     Le foto stanno in mondi/ come file separati e vengono chieste solo quando
+     la loro fascia si avvicina: incorporarle nel gioco lo avrebbe reso sei
+     volte piu pesante per tutti, anche per chi non arriva mai al primo mondo.
+
+     MONDO_AR e la proporzione delle immagini (9:16). La fascia e alta quanto
+     l'immagine disegnata a piena larghezza, quindi la foto entra intera e
+     nelle sue proporzioni: non viene ne tagliata ne deformata. Se una foto
+     avesse una proporzione diversa viene centrata nella fascia con delle
+     bande, mai ritagliata.
+
+     MONDO_VELO e la velatura scura sopra la foto: serve a tenere leggibili
+     prese e personaggio su fondi chiari. Portalo a 0 per foto piene. */
+  var MONDI = ['dhiva','cinturini','sagapo','rosato','brosway','pianegonda'];
+  var MONDO_AR = 3840 / 2160;
+  var MONDO_VELO = 0.28;
 
   var COL = {
     solid:  [['#2e8b72','#1a5c4b'],['#4f7ba8','#2f5279'],['#c2a57b','#8d7350'],['#3d8f5c','#255a39']],
@@ -748,6 +771,7 @@
     left = right = false;
     fireOff();
     btnFire.hidden = false;
+    caricaMondo(0);       // il primo mondo si scarica durante la salita del 2026
     ensureAudio();
     loadVoices();         // decodifica in anticipo: devono partire istantanee
     unlockVoiceEls();     // e sblocca il ripiego finche siamo dentro il tocco
@@ -1066,49 +1090,125 @@
 
   function hash(n){ var s = Math.sin(n*127.1)*43758.5453; return s - Math.floor(s); }
 
+  /* Le foto dei mondi si chiedono una alla volta. Su rete debole si riprova un
+     paio di volte e poi si lascia la fascia neutra, invece di insistere a ogni
+     fotogramma. */
+  var mondoImg = [];
+  function caricaMondo(k){
+    k = ((k % MONDI.length) + MONDI.length) % MONDI.length;
+    if (mondoImg[k]) return;
+    var m = mondoImg[k] = { img: new Image(), ok: false, tent: 1 };
+    m.img.onload  = function(){ m.ok = true; };
+    m.img.onerror = function(){
+      if (m.tent < 3){
+        m.tent++;
+        setTimeout(function(){ m.img.src = 'mondi/' + MONDI[k] + '.jpg?r=' + m.tent; }, 4000);
+      }
+    };
+    m.img.src = 'mondi/' + MONDI[k] + '.jpg';
+  }
+
+  /* I bulloni sulla roccia: stessa mano su tutte le fasce, disposti da hash()
+     cosi il motivo e sempre lo stesso a parita di fascia. */
+  function bulloni(gi, y0, alt){
+    ctx.fillStyle = 'rgba(0,0,0,.30)';
+    for (var b=0;b<9;b++){
+      var hx = 26 + hash(gi*31 + b)*(W-52);
+      var hy = y0 + hash(gi*57 + b*7)*alt;
+      ctx.beginPath(); ctx.arc(hx, hy, 3.1, 0, 6.2832); ctx.fill();
+    }
+  }
+
+  function drawCifra(ch, u0, gi, fs){
+    var cy = -(u0 + SEG/2) - cam;              // centro della fascia sullo schermo
+    var wd = ctx.measureText(ch).width || fs*0.6;
+    var k  = Math.min(1.2, (W*0.88) / wd);
+
+    ctx.save();
+    ctx.translate(W/2, cy);
+    ctx.scale(k, k*1.05);
+
+    ctx.fillStyle = '#6a5405';
+    for (var e=16;e>=1;e--) ctx.fillText(ch, e*1.5, e*1.5);
+
+    var g = ctx.createLinearGradient(0, -fs*0.5, 0, fs*0.5);
+    g.addColorStop(0,   '#f2d43a');
+    g.addColorStop(0.5, '#e8c21c');
+    g.addColorStop(1,   '#c9a40f');
+    ctx.fillStyle = g;
+    ctx.fillText(ch, 0, 0);
+
+    ctx.save();
+    ctx.beginPath(); ctx.rect(-fs, -fs*0.54, fs*2, fs*0.16); ctx.clip();
+    ctx.fillStyle = 'rgba(255,247,190,.40)';
+    ctx.fillText(ch, 0, 0);
+    ctx.restore();
+    ctx.restore();
+
+    bulloni(gi, cy - SEG*0.42, SEG*0.84);
+  }
+
+  function drawMondo(k, u0, alt, gi){
+    var yTop = -(u0 + alt) - cam;              // bordo alto della fascia
+    var m = mondoImg[k];
+
+    if (!m || !m.ok){
+      bulloni(gi, yTop + alt*0.08, alt*0.84);  // fascia neutra finche la foto arriva
+      return;
+    }
+
+    var iw = m.img.naturalWidth  || m.img.width;
+    var ih = m.img.naturalHeight || m.img.height;
+    if (!iw || !ih) return;
+
+    /* Piena larghezza e altezza dettata dalla proporzione: e il modo di
+       mostrarla intera senza stirarla. Il mezzo punto di tolleranza evita che
+       l'arrotondamento faccia scattare il rientro nel caso 9:16 esatto, che
+       lascerebbe una riga scura fra due mondi. */
+    var dw = W, dh = W * (ih / iw);
+    if (dh > alt + 0.5){ dh = alt; dw = alt * (iw / ih); }
+
+    ctx.drawImage(m.img, (W - dw)/2, yTop + (alt - dh)/2, dw, dh);
+
+    if (MONDO_VELO > 0){
+      ctx.fillStyle = 'rgba(8,8,10,' + MONDO_VELO + ')';
+      ctx.fillRect(0, yTop, W, alt);
+    }
+  }
+
   function drawWall(){
     ctx.fillStyle = '#08080a';
     ctx.fillRect(0,0,W,H);
 
-    var first = Math.floor((cam - SEG) / SEG);
-    var last  = Math.floor((cam + H + SEG) / SEG);
+    /* Un ciclo di parete: le quattro cifre del 2026, poi i sei mondi.
+       u misura la salita, cresce verso l'alto dove y diventa negativa. */
+    var MH = W * MONDO_AR;
+    var ALT_CIFRE = CIFRE.length * SEG;
+    var CICLO = ALT_CIFRE + MONDI.length * MH;
+
+    var uMin = -(cam + H), uMax = -cam;
+    var nMin = Math.floor(uMin / CICLO), nMax = Math.floor(uMax / CICLO);
+
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     var fs = 420;
     ctx.font = '400 ' + fs + 'px "Archivo Black", Impact, sans-serif';
 
-    for (var i=first;i<=last;i++){
-      var ch = DIGITS[((i % 4) + 4) % 4];
-      var cy = i*SEG + SEG/2 - cam;
-      var wd = ctx.measureText(ch).width || fs*0.6;
-      var k  = Math.min(1.2, (W*0.88) / wd);
+    for (var n=nMin; n<=nMax; n++){
+      var base = n * CICLO, s, u0;
 
-      ctx.save();
-      ctx.translate(W/2, cy);
-      ctx.scale(k, k*1.05);
+      for (s=0; s<CIFRE.length; s++){
+        u0 = base + s*SEG;
+        if (u0 + SEG < uMin || u0 > uMax) continue;
+        drawCifra(CIFRE[s], u0, n*CIFRE.length + s, fs);
+      }
 
-      ctx.fillStyle = '#6a5405';
-      for (var e=16;e>=1;e--) ctx.fillText(ch, e*1.5, e*1.5);
-
-      var g = ctx.createLinearGradient(0, -fs*0.5, 0, fs*0.5);
-      g.addColorStop(0,   '#f2d43a');
-      g.addColorStop(0.5, '#e8c21c');
-      g.addColorStop(1,   '#c9a40f');
-      ctx.fillStyle = g;
-      ctx.fillText(ch, 0, 0);
-
-      ctx.save();
-      ctx.beginPath(); ctx.rect(-fs, -fs*0.54, fs*2, fs*0.16); ctx.clip();
-      ctx.fillStyle = 'rgba(255,247,190,.40)';
-      ctx.fillText(ch, 0, 0);
-      ctx.restore();
-      ctx.restore();
-
-      ctx.fillStyle = 'rgba(0,0,0,.30)';
-      for (var b=0;b<9;b++){
-        var hx = 26 + hash(i*31 + b)*(W-52);
-        var hy = cy - SEG*0.42 + hash(i*57 + b*7)*SEG*0.84;
-        ctx.beginPath(); ctx.arc(hx, hy, 3.1, 0, 6.2832); ctx.fill();
+      for (s=0; s<MONDI.length; s++){
+        u0 = base + ALT_CIFRE + s*MH;
+        if (u0 + MH < uMin || u0 > uMax) continue;
+        caricaMondo(s);
+        caricaMondo(s + 1);                    // il prossimo si scarica in anticipo
+        drawMondo(s, u0, MH, n*MONDI.length + s);
       }
     }
 
