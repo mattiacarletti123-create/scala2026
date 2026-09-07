@@ -360,6 +360,10 @@
   /* Mostri: entrano oltre i MOSTRO_DA metri, traversano la parete e scendono
      piano incontro al giocatore. Il contatto e letale, un colpo li dissolve. */
   var MOSTRO_DA = 380, MOSTRO_R = 13;
+  /* Ampiezza del dondolio orizzontale, in unita di mondo per lato: su una
+     parete larga circa 380 sono pochi punti percentuali, un'oscillazione
+     appena percettibile. Alzalo per farli spaziare di piu. */
+  var MOSTRO_AMP = 16;
 
   /* Ali d'angelo: fotogrammi del rientro dopo una vita spesa. In questo tempo
      il personaggio e intoccabile, cosi non muore due volte nello stesso punto. */
@@ -929,10 +933,14 @@
       nextMostro--;
       if (nextMostro <= 0){
         nextMostro = Math.round(rnd(200, 330) - diff*70);
+        /* Il mostro non traversa la parete: dondola appena attorno al punto in
+           cui e comparso. MOSTRO_AMP e il massimo scostamento per lato, quindi
+           il punto di comparsa si tiene a quella distanza dai bordi. */
+        var amp = rnd(MOSTRO_AMP * 0.5, MOSTRO_AMP);
+        var mx0 = rnd(MOSTRO_R + 6 + amp, W - MOSTRO_R - 6 - amp);
         mostri.push({
-          x: rnd(MOSTRO_R + 6, W - MOSTRO_R - 6),
+          x: mx0, x0: mx0, amp: amp,
           y: cam - 50,
-          vx: (Math.random() < .5 ? -1 : 1) * rnd(0.7, 1.7),
           vy: 0.45 + diff*0.75,
           t: Math.random()*6.2832
         });
@@ -941,10 +949,11 @@
     for (var m=mostri.length-1;m>=0;m--){
       var ms = mostri[m];
       ms.t += 0.11;
-      ms.x += ms.vx;
+      // dondolio lento e stretto: un'andata e ritorno ogni tre secondi circa.
+      // Il clamp serve solo dopo una rotazione dello schermo, quando la parete
+      // cambia larghezza sotto ai mostri gia in scena.
+      ms.x = clamp(ms.x0 + Math.sin(ms.t * 0.32) * ms.amp, MOSTRO_R + 4, W - MOSTRO_R - 4);
       ms.y += ms.vy;
-      if (ms.x < MOSTRO_R + 4){ ms.x = MOSTRO_R + 4; ms.vx =  Math.abs(ms.vx); }
-      if (ms.x > W - MOSTRO_R - 4){ ms.x = W - MOSTRO_R - 4; ms.vx = -Math.abs(ms.vx); }
       if (ms.y > cam + H + 90){ mostri.splice(m,1); continue; }
 
       if (Math.abs(ms.x - player.x) < MOSTRO_R + PW*0.30 &&
