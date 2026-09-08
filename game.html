@@ -709,8 +709,14 @@
      uno finiscono nella radice, mentre la cartella trascinata intera
      conserva il percorso. */
   function clipPath(nome, tent){ return (tent === 1 ? 'audio/' : '') + CLIP_FILE[nome]; }
+
+  /* La posizione buona si scopre alla prima clip che arriva e da quel momento
+     vale per tutte. Serve al ripiego con <audio>, che altrimenti continuerebbe
+     a chiedere 'audio/...' anche quando i file stanno nella radice. */
+  var clipBase = null;
   function clipURI(nome){
-    return CLIPS[nome] ? 'data:audio/mpeg;base64,' + CLIPS[nome] : clipPath(nome, 1);
+    if (CLIPS[nome]) return 'data:audio/mpeg;base64,' + CLIPS[nome];
+    return (clipBase === null ? 'audio/' : clipBase) + CLIP_FILE[nome];
   }
 
   function loadClip(nome, tent){
@@ -723,9 +729,14 @@
       xhr.responseType = 'arraybuffer';
       xhr.onload = function(){
         if (xhr.status >= 200 && xhr.status < 300 && xhr.response){
+          clipBase = tent === 1 ? 'audio/' : '';
           try{
             actx.decodeAudioData(xhr.response,
-              function(b){ voiceBuf[nome] = b; },
+              function(b){
+                voiceBuf[nome] = b;
+                // se la frase era attesa da poco, parte adesso invece di perdersi
+                if (daDire === nome && Date.now() < daDireFino){ daDire = null; say(nome); }
+              },
               function(){ voiceTried[nome] = false; });
           } catch(e){ voiceTried[nome] = false; }
         }
@@ -786,9 +797,19 @@
     }
   }
 
+  /* Una frase chiesta mentre la sua clip sta ancora arrivando non si butta:
+     si tiene in attesa e parte appena decodificata, se non e passato troppo
+     tempo. Senza questo la prima voce si perdeva quando la rete era lenta. */
+  var daDire = null, daDireFino = 0;
+
   function say(nome){
     if (muted || (!CLIPS[nome] && !CLIP_FILE[nome])) return;
     var b = voiceBuf[nome];
+    if (!b && CLIP_FILE[nome] && ensureAudio()){
+      daDire = nome; daDireFino = Date.now() + 4000;
+      loadClip(nome);
+      return;
+    }
     if (b && ensureAudio()){
       try{
         var src = actx.createBufferSource(), g = actx.createGain();

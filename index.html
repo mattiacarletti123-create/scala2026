@@ -12,13 +12,22 @@
 <style>
   html,body{height:100%;margin:0;padding:0;background:#08080a;overflow:hidden;overscroll-behavior:none}
   iframe{position:fixed;inset:0;width:100%;height:100%;border:0;display:block;background:#08080a}
-  #err{
+
+  #att,#err{
     position:fixed;inset:0;display:none;align-items:center;justify-content:center;
     flex-direction:column;gap:14px;text-align:center;padding:28px;
     color:#f2efe6;background:#08080a;
     font-family:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;font-size:18px;line-height:1.4;
   }
-  #err strong{display:block;font-size:22px;color:#e8c21c;letter-spacing:.04em}
+  #att{display:flex}
+  #att b,#err strong{
+    display:block;font-family:Impact,"Arial Narrow",sans-serif;
+    font-size:26px;letter-spacing:.05em;color:#e8c21c;
+  }
+  #att small{color:#8c8678;font-size:15px}
+  .barra{width:min(74vw,260px);height:4px;background:#221f18;overflow:hidden}
+  .barra i{display:block;width:38%;height:100%;background:#e8c21c;animation:scorre 1.1s ease-in-out infinite}
+  @keyframes scorre{0%{transform:translateX(-100%)}100%{transform:translateX(360%)}}
   #err a{
     color:#151206;background:#e8c21c;text-decoration:none;
     padding:11px 26px;border-bottom:3px solid #7a6206;border-radius:3px;font-weight:700;
@@ -29,6 +38,12 @@
 
 <iframe id="g" title="Scala il 2026" allow="autoplay; fullscreen"></iframe>
 
+<div id="att">
+  <b>SCALA IL 2026</b>
+  <div class="barra"><i></i></div>
+  <small id="lento">caricamento</small>
+</div>
+
 <div id="err">
   <strong>Il gioco non si carica</strong>
   Controlla la connessione e riprova.
@@ -37,29 +52,55 @@
 
 <script>
 /* Guscio anti-cache.
-   Questo file non cambia mai, quindi puo restare in cache quanto vuole.
-   Il gioco vero sta in game.html e viene chiesto ogni volta con un parametro
+   Questo file cambia di rado, quindi puo restare in cache quanto vuole. Il
+   gioco vero sta in game.html e viene chiesto ogni volta con un parametro
    diverso: per il browser e sempre un indirizzo nuovo, quindi non serve mai
-   svuotare niente e ogni aggiornamento e visibile all'istante. */
+   svuotare niente e ogni aggiornamento e visibile all'istante.
+
+   Sul caricamento lento: il gioco pesa quasi 200KB, e le foto dei mondi e le
+   voci arrivano dopo, dalle cartelle mondi/ e audio/, man mano che la salita
+   se le avvicina. Su una rete debole puo metterci parecchio, e la versione
+   precedente di questo guscio dopo dieci secondi nascondeva il gioco e
+   dichiarava l'errore mentre il file stava ancora arrivando. Ora l'attesa ha
+   una sua schermata, la resa avviene molto piu tardi, e se il gioco arriva
+   anche dopo prende comunque il posto dell'errore. */
 (function(){
-  var f   = document.getElementById('g');
-  var err = document.getElementById('err');
-  var url = 'game.html?v=' + Date.now();
+  var f    = document.getElementById('g');
+  var att  = document.getElementById('att');
+  var err  = document.getElementById('err');
+  var url  = 'game.html?v=' + Date.now();
   var caricato = false;
 
   document.getElementById('dir').href = url;
 
-  f.addEventListener('load', function(){
+  function pronto(){
+    if (caricato) return;
     caricato = true;
+    att.style.display = 'none';
+    err.style.display = 'none';
+    f.style.display = 'block';
     // la tastiera funziona solo se il frame ha il fuoco (conta sul desktop)
     try { f.contentWindow.focus(); } catch(e){}
+  }
+
+  f.addEventListener('load', pronto);
+  f.addEventListener('error', function(){
+    att.style.display = 'none';
+    err.style.display = 'flex';
   });
   f.src = url;
 
-  // se dopo dieci secondi non e arrivato nulla, mostra una via d'uscita
+  // dopo un po' di attesa lo diciamo, senza pero' interrompere niente
   setTimeout(function(){
-    if (!caricato){ f.style.display = 'none'; err.style.display = 'flex'; }
-  }, 10000);
+    if (!caricato) document.getElementById('lento').textContent =
+      'la rete e lenta, ancora un momento';
+  }, 8000);
+
+  // resa solo molto piu tardi, e comunque reversibile: se il gioco arriva
+  // dopo, il gestore di load rimette tutto a posto
+  setTimeout(function(){
+    if (!caricato){ att.style.display = 'none'; err.style.display = 'flex'; }
+  }, 45000);
 
   // un tocco qualsiasi riporta il fuoco dentro al gioco
   addEventListener('pointerdown', function(){
