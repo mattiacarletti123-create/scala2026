@@ -382,7 +382,8 @@
   /* ---------- i mondi ----------
      Passata la parete del 2026 la salita attraversa i marchi del gruppo, una
      fascia per marchio, nell'ordine in cui si incontrano salendo. Dopo
-     l'ultima il ciclo riparte dal 2026.
+     pianegonda si ricomincia da dhiva e le sei foto si ripetono cosi senza
+     fine: il 2026 resta in fondo, si vede una volta sola in apertura.
 
      Le foto stanno in mondi/ come file separati e vengono chieste solo quando
      la loro fascia si avvicina: incorporarle nel gioco lo avrebbe reso sei
@@ -447,23 +448,28 @@
      ALT_CIFRE e l'altezza del blocco 2026, MH quella di una fascia di
      marchio, CICLO un giro completo. Sono l'unica sorgente: le usano il
      disegno della parete, il meteo e le voci. */
-  var ALT_CIFRE = 0, MH = 0, CICLO = 0;
+  var ALT_CIFRE = 0, MH = 0, GIRO = 0, CICLO = 0;
   function misuraParete(){
     ALT_CIFRE = CIFRE.length * SEG;
     MH        = W * MONDO_AR;
-    CICLO     = ALT_CIFRE + MONDI.length * MH;
+    GIRO      = MONDI.length * MH;      // un passaggio completo sui sei marchi
+    CICLO     = ALT_CIFRE + GIRO;       // 2026 piu il primo giro: il tratto d'apertura
   }
 
   /* Dove siamo sulla parete: k vale -1 sul 2026 e 0-5 sui marchi, pos e la
-     quota raggiunta dentro la fascia, giro conta i cicli completi e id
-     identifica la fascia giro per giro. */
+     quota raggiunta dentro la fascia, giro conta i passaggi completi sui sei
+     marchi e id identifica la fascia in modo unico.
+
+     La parete del 2026 sta solo in fondo e si incontra una volta sola: da
+     sopra le cifre i mondi si ripetono senza fine, e dopo pianegonda torna
+     dhiva. Il 2026 e l'apertura, non un ritornello. */
   function fascia(u){
-    var giro = Math.floor(u / CICLO);
-    var pos  = u - giro * CICLO;
-    if (pos < ALT_CIFRE) return { k:-1, giro:giro, pos:pos, alt:ALT_CIFRE, id:'p' + giro };
-    var k = Math.floor((pos - ALT_CIFRE) / MH);
+    if (u < ALT_CIFRE) return { k:-1, giro:0, pos:u, alt:ALT_CIFRE, id:'p0' };
+    var q = u - ALT_CIFRE;
+    var giro = Math.floor(q / GIRO);
+    var k = Math.floor((q - giro * GIRO) / MH);
     if (k > MONDI.length - 1) k = MONDI.length - 1;
-    return { k:k, giro:giro, pos:pos - ALT_CIFRE - k*MH, alt:MH, id:'m' + giro + '_' + k };
+    return { k:k, giro:giro, pos:q - giro*GIRO - k*MH, alt:MH, id:'m' + giro + '_' + k };
   }
 
   /* ---------- il ritmo della salita ----------
@@ -471,9 +477,9 @@
      facile: serve a far vedere i mondi, non a fermare la gente al terzo.
      Prese larghe, dislivelli corti, sassi lenti e nessun mostro.
 
-     Passata pianegonda la parete riparte dal 2026 e da li diventa un'altra
-     cosa: la difficolta sale al massimo, entrano i mostri e le voci tacciono
-     (resta solo la caduta). Cambiare i due numeri qui sotto sposta tutto:
+     Passata pianegonda i mondi ricominciano da dhiva e la parete diventa
+     un'altra cosa: la difficolta sale al massimo, entrano i mostri e le voci
+     tacciono (resta solo la caduta). Cambiare i due numeri qui sotto sposta:
      FACILE e il tetto di difficolta del primo giro, SALITA quanti giri servono
      poi ad arrivare al massimo. */
   var FACILE = 0.30, SALITA = 0.75;
@@ -1371,8 +1377,6 @@
                aRetro:0, aFronte:0, brina:0 };
 
   function lp(a, b, t){ return a + (b - a) * t; }
-  function fasciaSu(k){ return k >= MONDI.length - 1 ? -1 : k + 1; }
-  function fasciaGiu(k){ return k < 0 ? MONDI.length - 1 : k - 1; }
 
   function meteoOra(){
     var u = -(cam + H * 0.5);                  // il meteo lo detta il centro dello schermo
@@ -1380,19 +1384,22 @@
     var a = meteoDi(f.k), b = a, t = 0;
     var mezzo = Math.min(H * 0.5, f.alt * 0.35);
 
+    /* La fascia prima e quella dopo. Dopo pianegonda viene dhiva, non il 2026:
+       da qui in su la neve non si interrompe mai piu. Il 2026 e sotto una volta
+       sola, e solo il primo dhiva ha la parete muta alle spalle. */
+    var giu = (f.giro === 0 && f.k === 0) ? -1 : (f.k + MONDI.length - 1) % MONDI.length;
+    var su  = (f.k + 1) % MONDI.length;
+
     if (f.k < 0){
       t = 0;                                   // sulla parete del 2026 non nevica
-    } else if (fasciaGiu(f.k) < 0 && f.pos < mezzo){
+    } else if (giu < 0 && f.pos < mezzo){
       // appena lasciato il 2026 la neve non arriva di colpo: sale dentro il mondo
       b = meteoDi(-1); t = 1 - f.pos / mezzo;
-    } else if (fasciaSu(f.k) < 0 && f.alt - f.pos < mezzo){
-      // e prima di tornare sul 2026 si spegne, senza sparire di scatto
-      b = meteoDi(-1); t = 1 - (f.alt - f.pos) / mezzo;
     } else if (f.alt - f.pos < mezzo){         // il confine fra due mondi sta arrivando
-      b = meteoDi(fasciaSu(f.k));
+      b = meteoDi(su);
       t = 0.5 * (1 - (f.alt - f.pos) / mezzo);
     } else if (f.pos < mezzo){                 // il confine e appena passato
-      b = meteoDi(fasciaGiu(f.k));
+      b = meteoDi(giu);
       t = 0.5 * (1 - f.pos / mezzo);
     }
 
@@ -1593,39 +1600,40 @@
     ctx.fillStyle = '#08080a';
     ctx.fillRect(0,0,W,H);
 
-    /* Un ciclo di parete: le quattro cifre del 2026, poi i sei mondi.
-       u misura la salita, cresce verso l'alto dove y diventa negativa.
+    /* u misura la salita e cresce verso l'alto, dove y diventa negativa.
        Le misure arrivano da misuraParete(). */
     var uMin = -(cam + H), uMax = -cam;
-    var nMin = Math.floor(uMin / CICLO), nMax = Math.floor(uMax / CICLO);
+    var s, u0;
 
+    /* Le quattro cifre del 2026 stanno solo in fondo alla parete: si
+       incontrano una volta sola, in apertura. Sotto lo zero non c'e niente,
+       solo roccia: e il motivo per cui alla partenza non si intravede piu la
+       cima di pianegonda. */
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     var fs = 420;
     ctx.font = '400 ' + fs + 'px "Archivo Black", Impact, sans-serif';
 
-    for (var n=nMin; n<=nMax; n++){
-      var base = n * CICLO, s, u0;
+    for (s=0; s<CIFRE.length; s++){
+      u0 = s*SEG;
+      if (u0 + SEG < uMin || u0 > uMax) continue;
+      drawCifra(CIFRE[s], u0, s, fs);
+    }
 
-      for (s=0; s<CIFRE.length; s++){
-        u0 = base + s*SEG;
-        if (u0 + SEG < uMin || u0 > uMax) continue;
-        drawCifra(CIFRE[s], u0, n*CIFRE.length + s, fs);
-      }
-
-      for (s=0; s<MONDI.length; s++){
-        u0 = base + ALT_CIFRE + s*MH;
-        if (u0 + MH < uMin || u0 > uMax) continue;
-        /* Sotto la partenza non si disegna nessun mondo. Senza questo, alla
-           prima schermata si vedeva la cima di pianegonda — l'ultima fascia
-           del giro precedente, che sta sotto lo zero — e il gioco si metteva
-           pure a scaricarne la foto per niente. Sotto lo zero c'e roccia. */
-        if (u0 < 0) continue;
-        caricaMondo(s);
-        caricaMondo(s + 1);                    // il prossimo si scarica in anticipo
-        caricaVoce(s); caricaVoce(s + 1);      // e con lui la sua voce
-        drawMondo(s, u0, MH, n*MONDI.length + s);
-      }
+    /* Sopra le cifre i mondi si ripetono senza fine: passata pianegonda si
+       ricomincia da dhiva. j conta le fasce da quando finisce il 2026, quindi
+       il resto della divisione per sei dice di quale marchio si tratta e le
+       foto tornano in ordine, sempre le stesse sei. */
+    var jMin = Math.floor((uMin - ALT_CIFRE) / MH);
+    var jMax = Math.floor((uMax - ALT_CIFRE) / MH);
+    if (jMin < 0) jMin = 0;
+    for (var j=jMin; j<=jMax; j++){
+      u0 = ALT_CIFRE + j*MH;
+      var k = j % MONDI.length;
+      caricaMondo(k);
+      caricaMondo(k + 1);                      // il prossimo si scarica in anticipo
+      caricaVoce(k); caricaVoce(k + 1);        // e con lui la sua voce
+      drawMondo(k, u0, MH, j);
     }
 
     var vg = ctx.createLinearGradient(0,0,0,H);
