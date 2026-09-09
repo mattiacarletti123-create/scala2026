@@ -808,6 +808,25 @@
      tempo. Senza questo la prima voce si perdeva quando la rete era lenta. */
   var daDire = null, daDireFino = 0;
 
+  /* Le voci avviate si tengono da parte, altrimenti non c'e modo di fermarle:
+     una BufferSource, una volta partita, suona fino in fondo. Serve nei due
+     momenti in cui una frase ne troverebbe un'altra ancora aperta: quando si
+     perde (la voce del mondo si accavallava con "hai perso") e quando si
+     riprova subito, con "hai perso" che parlava ancora. */
+  var voceInCorso = [];
+
+  function zittisci(){
+    daDire = null;                        // anche la frase che stava per partire
+    var i, k;
+    for (i=0;i<voceInCorso.length;i++){
+      try { voceInCorso[i].stop(); } catch(e){}
+    }
+    voceInCorso.length = 0;
+    for (k in voiceEl){
+      try { voiceEl[k].pause(); voiceEl[k].currentTime = 0; } catch(e){}
+    }
+  }
+
   function say(nome){
     if (muted || (!CLIPS[nome] && !CLIP_FILE[nome])) return;
     var b = voiceBuf[nome];
@@ -822,6 +841,12 @@
         src.buffer = b;
         g.gain.value = 0.95;
         src.connect(g); g.connect(actx.destination);
+        voceInCorso.push(src);
+        src.onended = function(){          // finita da sola: esce dalla lista
+          for (var i=0;i<voceInCorso.length;i++){
+            if (voceInCorso[i] === src){ voceInCorso.splice(i, 1); break; }
+          }
+        };
         src.start();
         return;
       } catch(e){}
@@ -912,6 +937,9 @@
   document.getElementById('btnRetry').addEventListener('click', start);
 
   function start(){
+    /* Chi riprova subito dopo una caduta lo fa mentre "hai perso" sta ancora
+       parlando: senza questo si accavallava con "sognare in grande". */
+    zittisci();
     reset();
     pStart.hidden = true; pOver.hidden = true;
     state = 'playing';
@@ -1201,6 +1229,9 @@
 
   function gameOver(){
     state = 'over';
+    /* Prima di tutto silenzio: la frase del mondo va troncata sul colpo, cosi
+       "hai perso" resta l'unica voce. I due tonfi restano, sono la caduta. */
+    zittisci();
     fireOff();
     btnFire.hidden = true;
     var isRecord = score > best;
