@@ -2513,8 +2513,9 @@
     var a = (t + 1) / 2;
     if (player.stun > 0) a = 0.12 + Math.sin(player.stun*0.7)*0.1;
 
-    // l'ombra sulla parete, spostata in basso a destra come quella delle prese
-    ctx.drawImage(ombraMorbida(), x - 30 + 7, y - 92 + 10, 60, 98);
+    /* Niente ombra morbida dietro al personaggio: e quasi sempre in volo, e
+       sulla parete si leggeva come un alone scuro intorno a lui (tolta il
+       20/10 su richiesta di Mattia). */
     // al rientro con le ali, una luce calda lo avvolge
     if (player.ali > 0) luce('255,244,210', x, y - 40, 62, 0.55 * clamp(player.ali / 30, 0, 1));
 
