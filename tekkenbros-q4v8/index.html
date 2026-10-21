@@ -784,8 +784,21 @@ const STAGES=[
   c.strokeStyle='rgba(255,255,255,0.3)';c.lineWidth=3;
   c.beginPath();c.moveTo(0,598);c.lineTo(W,598);c.stroke();
   for(let i=-7;i<=7;i++){c.beginPath();c.moveTo(W/2+i*95,598);c.lineTo(W/2+i*240,H);c.stroke()}
- }}
+ }},
+ // scenari dalle foto della sede (Montegiorgio): in alto la foto, sotto il pavimento
+ {nome:'Atrio di Vetro',foto:'ambientazioni/gioco/atrio.jpg',pav:'#8a8e93',alto:10,draw(c){fotoStage(c,this)}},
+ {nome:'Cortile Interno',foto:'ambientazioni/gioco/cortile.jpg',pav:'#3e6a47',draw(c){fotoStage(c,this)}}
 ];
+for(const st of STAGES)if(st.foto){st.img=new Image();st.img.src=st.foto;st.img.onload=()=>{st.cv=null}}
+function fotoStage(c,st){
+ c.fillStyle=st.pav;c.fillRect(0,0,W,H);
+ const img=st.img;
+ if(img&&img.complete&&img.naturalWidth){
+  const s=Math.max(W/img.naturalWidth,575/img.naturalHeight),w=img.naturalWidth*s,h=img.naturalHeight*s;
+  c.drawImage(img,(W-w)/2,575-h,w,h);
+ }
+ const g=c.createLinearGradient(0,575,0,H);g.addColorStop(0,'rgba(0,0,0,0.05)');g.addColorStop(1,'rgba(0,0,0,0.35)');c.fillStyle=g;c.fillRect(0,575,W,H-575);
+}
 function stageCanvas(st){
  if(!st.cv){const c=document.createElement('canvas');c.width=W;c.height=H;st.draw(c.getContext('2d'));st.cv=c}
  return st.cv;
@@ -798,7 +811,9 @@ const STAGE3D=[
  {fog:0x1b1f2a,sky:0xfff1d6,gnd:0x2a2f3a,hi:0.5,key:0xffe9c4,ki:0.6,rim:0x6688ff,ri:0.25},
  {fog:0x262a36,sky:0xdfe9ff,gnd:0x30343f,hi:0.5,key:0xffffff,ki:0.55,rim:0x4aa3ff,ri:0.3},
  {fog:0x2a1530,sky:0xffe0f0,gnd:0x24122a,hi:0.45,key:0xfff0d0,ki:0.6,rim:0xff4fd8,ri:0.35},
- {fog:0x6a2f5a,sky:0xffc89a,gnd:0x2a2630,hi:0.5,key:0xffb070,ki:0.7,rim:0x8a5cff,ri:0.3}
+ {fog:0x6a2f5a,sky:0xffc89a,gnd:0x2a2630,hi:0.5,key:0xffb070,ki:0.7,rim:0x8a5cff,ri:0.3},
+ {fog:0xc4c8cd,sky:0xffffff,gnd:0x8a8e93,hi:0.6,key:0xffffff,ki:0.7,rim:0x9fd3ff,ri:0.25},
+ {fog:0xa9bccf,sky:0xeaf4ff,gnd:0x3e6a47,hi:0.6,key:0xfff4dd,ki:0.75,rim:0xffffff,ri:0.25}
 ];
 function tm(c){return new THREE.MeshToonMaterial({color:new THREE.Color(c)})}
 function lm(c,o){return new THREE.MeshLambertMaterial(Object.assign({color:new THREE.Color(c)},o||{}))}
@@ -1108,7 +1123,15 @@ function emojiTex(em){
 }
 function floorTex(i){
  const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d'),r=seeded(5+i);
- x.fillStyle=['#50535c','#4c5160','#1d1a22','#2c2833'][i];x.fillRect(0,0,256,256);
+ x.fillStyle=['#50535c','#4c5160','#1d1a22','#2c2833','#8a8e93','#3e6a47'][i];x.fillRect(0,0,256,256);
+ if(i===4){ // pietra grigia con venature, come il pavimento dell'atrio
+  for(let k=0;k<600;k++){x.fillStyle=r()<0.5?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.05)';x.fillRect(r()*256,r()*256,3,3)}
+  for(let k=0;k<4;k++){x.strokeStyle=`rgba(235,238,242,${0.08+r()*0.1})`;x.lineWidth=0.6+r()*0.6;x.beginPath();x.moveTo(r()*256,r()*256);for(let j=0;j<4;j++)x.lineTo(r()*256,r()*256);x.stroke()}
+  x.strokeStyle='rgba(60,62,66,0.35)';x.lineWidth=1.5;x.strokeRect(0,0,256,256);
+ }
+ if(i===5){ // prato sintetico
+  for(let k=0;k<5000;k++){const v=r();x.fillStyle=v<0.5?`rgba(90,140,95,${0.25+r()*0.3})`:`rgba(25,55,32,${0.2+r()*0.3})`;x.fillRect(r()*256,r()*256,1,2+r()*3)}
+ }
  if(i===0||i===3){for(let k=0;k<900;k++){x.fillStyle=r()<0.5?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.14)';x.fillRect(r()*256,r()*256,2,2)}x.strokeStyle='rgba(0,0,0,0.3)';x.lineWidth=2;x.strokeRect(0,0,256,256)}
  if(i===1){x.fillStyle='#454a58';x.fillRect(0,0,128,128);x.fillRect(128,128,128,128);for(let k=0;k<1500;k++){x.fillStyle='rgba(255,255,255,0.04)';x.fillRect(r()*256,r()*256,1,1)}}
  if(i===2){for(let k=0;k<40;k++){x.strokeStyle=`rgba(255,255,255,${0.03+r()*0.06})`;x.lineWidth=1+r()*2;x.beginPath();x.moveTo(r()*256,0);x.bezierCurveTo(r()*256,90,r()*256,170,r()*256,256);x.stroke()}x.strokeStyle='rgba(212,175,55,0.6)';x.lineWidth=3;x.strokeRect(0,0,256,256)}
@@ -1117,10 +1140,19 @@ function floorTex(i){
 function buildStage(i){
  const T=THREE,g=G3.g,o=new T.Group();
  const add=(mesh,x,y,z)=>{mesh.position.set(x,y,z);o.add(mesh);return mesh};
- const tex=new T.CanvasTexture(stageCanvas(STAGES[i]));tex.offset.set(0,1-575/720);tex.repeat.set(1,575/720);
- const bw=34,bh=bw*575/1280;
- add(M(g.plane,new T.MeshBasicMaterial({map:tex,fog:false}),bw,bh,1),0,bh/2-0.6,-9);
- const flm=i===2?new T.MeshPhongMaterial({map:floorTex(i),shininess:40,specular:0x221822}):new T.MeshLambertMaterial({map:floorTex(i)});
+ const st=STAGES[i];
+ if(st.img){
+  // foto vera della sede come fondale; ai lati due copie specchiate per coprire tutta la larghezza
+  const tex=new T.Texture(st.img);
+  const ok=()=>{tex.needsUpdate=true};if(st.img.complete&&st.img.naturalWidth)ok();else st.img.addEventListener('load',ok);
+  const bh=st.alto||14,bw=bh*(st.img.naturalWidth||945)/(st.img.naturalHeight||492),mat=new T.MeshBasicMaterial({map:tex,fog:false,side:T.DoubleSide});
+  for(const k of[-1,0,1]){const p=add(M(g.plane,mat,bw*(k?-1:1),bh,1),k*bw,bh/2-0.05,-9)}
+ }else{
+  const tex=new T.CanvasTexture(stageCanvas(st));tex.offset.set(0,1-575/720);tex.repeat.set(1,575/720);
+  const bw=34,bh=bw*575/1280;
+  add(M(g.plane,new T.MeshBasicMaterial({map:tex,fog:false}),bw,bh,1),0,bh/2-0.6,-9);
+ }
+ const flm=i===2?new T.MeshPhongMaterial({map:floorTex(i),shininess:40,specular:0x221822}):i===4?new T.MeshPhongMaterial({map:floorTex(i),shininess:30,specular:0x333333}):new T.MeshLambertMaterial({map:floorTex(i)});
  const fl=add(M(g.plane,flm,44,22,1),0,0,-1);fl.rotation.x=-Math.PI/2;
  const r=seeded(31+i);
  if(i===0){
@@ -1158,7 +1190,7 @@ function buildStage(i){
    const ring=add(M(g.torus,gold,0.16),x-0.12,1.3,-3.6);ring.rotation.y=0.6;
    add(M(g.oct,dia,0.09,0.13,0.09),x+0.18,1.25,-3.6);
   }
- }else{
+ }else if(i===3){
   const wl=lm('#ffffff',{emissive:0x333333}),cone=lm('#ff6b1a'),tyre=lm('#0d0a12'),light=new T.MeshBasicMaterial({color:0xffe9a8});
   for(let x=-10.4;x<=10.4;x+=2.6)add(M(g.box,wl,0.08,0.01,3),x,0.006,-5);
   for(const[x,z,c]of[[-8.4,-3.6,'#3a2747'],[8.2,-3.8,'#5c2a3a'],[1.5,-6.6,'#2b3a5c']]){
