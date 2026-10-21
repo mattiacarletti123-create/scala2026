@@ -1271,7 +1271,10 @@ function drawFighters(list,shadow=true){
 
 /* ---------- stato del gioco ---------- */
 const DIFFS=[{n:'Facile',l:0.25},{n:'Normale',l:0.55},{n:'Difficile',l:0.85}];
-const OPT={diff:1,arenaN:6};
+const OPT={diff:1,arenaN:6,sc:0};
+// scelta dello scenario dal menù: di default si gioca nella sede (atrio o cortile)
+const SCENARI=[{n:'Sede Bros',l:[4,5]},{n:'Tutti a caso',l:[0,1,2,3,4,5]}].concat(STAGES.map((s,i)=>({n:s.nome,l:[i]})));
+function pickStage(){const l=SCENARI[OPT.sc].l;return l[Math.random()*l.length|0]}
 let scene='title',T=0,timeScale=1;
 let TITLE=null,MENU={i:0},SEL=null,VS=null,F=null,RES=null,LADDER=null;
 
@@ -1300,7 +1303,7 @@ function buildLadder(player){
  return{player,opps,idx:0};
 }
 function ladderCfg(){
- return{mode:'cpu',defs:[LADDER.player,LADDER.opps[LADDER.idx]],ctrl:[0,'cpu'],lvl:clamp(DIFFS[OPT.diff].l+LADDER.idx*0.07,0,0.97),stage:Math.random()*STAGES.length|0};
+ return{mode:'cpu',defs:[LADDER.player,LADDER.opps[LADDER.idx]],ctrl:[0,'cpu'],lvl:clamp(DIFFS[OPT.diff].l+LADDER.idx*0.07,0,0.97),stage:pickStage()};
 }
 function goVS(cfg){scene='vs';VS={cfg,t:0};SFX.ok()}
 
@@ -1583,15 +1586,17 @@ function step(){
    const lr=(anyTake('right')?1:0)-(anyTake('left')?1:0),cur=MENU_ITEMS[MENU.i].id;
    if(lr&&cur==='diff'){OPT.diff=clamp(OPT.diff+lr,0,2);SFX.move()}
    if(lr&&cur==='arenaN'){OPT.arenaN=clamp(OPT.arenaN+lr,3,8);SFX.move()}
+   if(lr&&cur==='stage'){OPT.sc=(OPT.sc+lr+SCENARI.length)%SCENARI.length;SFX.move()}
    if(anyTake('back')){SFX.back();goTitle();break}
    let go=anyTake('ok','punch');
-   MENU_ITEMS.forEach((m,i)=>{if(tapped(W/2-320,menuY(i)-29,610,58)){MENU.i=i;go=true}});
+   MENU_ITEMS.forEach((m,i)=>{if(tapped(W/2-320,menuY(i)-27,610,54)){MENU.i=i;go=true}});
    if(go){
     const id=MENU_ITEMS[MENU.i].id;
     if(id==='cpu'||id==='1v1'||id==='arena'){SFX.ok();goSelect(id)}
     else if(id==='online'){SFX.ok();goLobby()}
     else if(id==='diff'){OPT.diff=(OPT.diff+1)%3;SFX.move()}
     else if(id==='arenaN'){OPT.arenaN=OPT.arenaN>=8?3:OPT.arenaN+1;SFX.move()}
+    else if(id==='stage'){OPT.sc=(OPT.sc+1)%SCENARI.length;SFX.move()}
     else{SFX.ok();scene='controls'}
    }
    break;
@@ -1626,13 +1631,13 @@ function resultAction(o){
  if(RES.cfg.mode==='online'){
   if(o==='Esci dalla partita'){netBye();goMenu();return}
   if(NET.role==='guest'){netSend({t:'req',o});RES.wait=true;return}
-  if(o==='Rivincita'){const cfg=Object.assign({},RES.cfg,{stage:Math.random()*STAGES.length|0});goVS(cfg);netSend({t:'vs',cfg:encCfg(cfg)})}
+  if(o==='Rivincita'){const cfg=Object.assign({},RES.cfg,{stage:pickStage()});goVS(cfg);netSend({t:'vs',cfg:encCfg(cfg)})}
   else if(o==='Cambia lottatori'){goSelect('online');netSend({t:'go',to:'select'})}
   return;
  }
  if(o==='Prossimo incontro'){LADDER.idx++;goVS(ladderCfg())}
  else if(o==='Riprova')goVS(ladderCfg());
- else if(o==='Rivincita')goVS(Object.assign({},RES.cfg,{stage:Math.random()*STAGES.length|0}));
+ else if(o==='Rivincita')goVS(Object.assign({},RES.cfg,{stage:pickStage()}));
  else if(o==='Cambia lottatori')goSelect(RES.cfg.mode);
  else goMenu();
 }
@@ -1777,7 +1782,7 @@ function selectStep(){
  if(!all){S.ready=0;return}
  if(online){
   if(me===0&&++S.ready>45){
-   const cfg={mode:'online',defs:[ROSTER[S.cur[0]],ROSTER[S.cur[1]]],ctrl:[0,1],lvl:0.5,stage:Math.random()*STAGES.length|0};
+   const cfg={mode:'online',defs:[ROSTER[S.cur[0]],ROSTER[S.cur[1]]],ctrl:[0,1],lvl:0.5,stage:pickStage()};
    goVS(cfg);netSend({t:'vs',cfg:encCfg(cfg)});
   }
   return;
@@ -1790,11 +1795,11 @@ function selectStep(){
    const rest=shuffle(ROSTER.filter(d=>!defs.includes(d)));
    while(defs.length<OPT.arenaN&&rest.length){defs.push(rest.shift());ctrl.push('cpu')}
    const order=shuffle(defs.map((d,i)=>i));
-   goVS({mode:'arena',defs:order.map(i=>defs[i]),ctrl:order.map(i=>ctrl[i]),lvl:DIFFS[OPT.diff].l,stage:Math.random()*STAGES.length|0});
+   goVS({mode:'arena',defs:order.map(i=>defs[i]),ctrl:order.map(i=>ctrl[i]),lvl:DIFFS[OPT.diff].l,stage:pickStage()});
   }
  }else if(++S.ready>45){
   if(S.mode==='cpu'){LADDER=buildLadder(ROSTER[S.cur[0]]);goVS(ladderCfg())}
-  else goVS({mode:'1v1',defs:[ROSTER[S.cur[0]],ROSTER[S.cur[1]]],ctrl:[0,1],lvl:0.5,stage:Math.random()*STAGES.length|0});
+  else goVS({mode:'1v1',defs:[ROSTER[S.cur[0]],ROSTER[S.cur[1]]],ctrl:[0,1],lvl:0.5,stage:pickStage()});
  }
 }
 
@@ -1833,9 +1838,10 @@ const MENU_ITEMS=[
  {id:'arena',t:'ARENA',d:"Tutti contro tutti: l'ultimo in piedi vince"},
  {id:'diff',t:'DIFFICOLTÀ CPU',d:'Quanto picchia il computer'},
  {id:'arenaN',t:'LOTTATORI ARENA',d:"Quanti colleghi nell'arena (3-8)"},
+ {id:'stage',t:'SCENARIO',d:'Dove si combatte: la sede Bros o gli scenari disegnati'},
  {id:'cmd',t:'COMANDI',d:'Tasti e mosse'}
 ];
-const menuY=i=>238+i*60;
+const menuY=i=>226+i*55;
 function drawMenu(){
  bgFX('#1a0a2e','#000',T);
  logo(260,110,0.44);
@@ -1845,6 +1851,7 @@ function drawMenu(){
   let label=m.t;
   if(m.id==='diff')label+=`   ◄ ${DIFFS[OPT.diff].n.toUpperCase()} ►`;
   if(m.id==='arenaN')label+=`   ◄ ${OPT.arenaN} ►`;
+  if(m.id==='stage')label+=`   ◄ ${SCENARI[OPT.sc].n.toUpperCase()} ►`;
   txt(label,x-240,y,34,sel?'#fff':'rgba(255,255,255,0.65)','left',FONT,sel?5:0);
  });
  txt(MENU_ITEMS[MENU.i].d,W/2,672,22,'#ffd32a','center',FONT2,4);
