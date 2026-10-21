@@ -768,10 +768,10 @@ function drawStage(st,t){ctx.drawImage(stageCanvas(st),0,0,W,H);if(st.anim)st.an
 /* ---------- grafica 3D (three.js r128). Se la libreria non arriva, resta la grafica 2D ---------- */
 var G3={ok:false,dtN:0,dtAvg:16.7,pr:0,pool:{},used:{},stageObjs:{},curStage:-1,stageObj:null,emo:{},sprites:[],shadows:[],cx:null,cd:null,k:1};
 const STAGE3D=[
- {fog:0x1b1f2a,sky:0xfff1d6,gnd:0x2a2f3a,hi:0.8,key:0xffe9c4,ki:0.85,rim:0x6688ff,ri:0.45},
- {fog:0x262a36,sky:0xdfe9ff,gnd:0x30343f,hi:0.8,key:0xffffff,ki:0.8,rim:0x4aa3ff,ri:0.6},
- {fog:0x2a1530,sky:0xffe0f0,gnd:0x24122a,hi:0.75,key:0xfff0d0,ki:0.9,rim:0xff4fd8,ri:0.75},
- {fog:0x6a2f5a,sky:0xffc89a,gnd:0x2a2630,hi:0.85,key:0xffb070,ki:1.0,rim:0x8a5cff,ri:0.55}
+ {fog:0x1b1f2a,sky:0xfff1d6,gnd:0x2a2f3a,hi:0.5,key:0xffe9c4,ki:0.6,rim:0x6688ff,ri:0.25},
+ {fog:0x262a36,sky:0xdfe9ff,gnd:0x30343f,hi:0.5,key:0xffffff,ki:0.55,rim:0x4aa3ff,ri:0.3},
+ {fog:0x2a1530,sky:0xffe0f0,gnd:0x24122a,hi:0.45,key:0xfff0d0,ki:0.6,rim:0xff4fd8,ri:0.35},
+ {fog:0x6a2f5a,sky:0xffc89a,gnd:0x2a2630,hi:0.5,key:0xffb070,ki:0.7,rim:0x8a5cff,ri:0.3}
 ];
 function tm(c){return new THREE.MeshToonMaterial({color:new THREE.Color(c)})}
 function lm(c,o){return new THREE.MeshLambertMaterial(Object.assign({color:new THREE.Color(c)},o||{}))}
@@ -788,9 +788,9 @@ function init3D(){
   G3.scam=new T.PerspectiveCamera(30,W/H,0.1,100);G3.scam.position.set(0,0,12);G3.scam.lookAt(0,0,0);
   G3.upp=2*12*Math.tan(15*Math.PI/180)/H;
   G3.show=new T.Scene();
-  G3.show.add(new T.HemisphereLight(0xffffff,0x443344,0.85));
-  const k=new T.DirectionalLight(0xffffff,0.85);k.position.set(4,6,10);G3.show.add(k);
-  const rim=new T.DirectionalLight(0xff6a5a,0.7);rim.position.set(-6,3,-4);G3.show.add(rim);
+  G3.show.add(new T.HemisphereLight(0xffffff,0x443344,0.5));
+  const k=new T.DirectionalLight(0xffffff,0.6);k.position.set(4,6,10);G3.show.add(k);
+  const rim=new T.DirectionalLight(0xff6a5a,0.35);rim.position.set(-6,3,-4);G3.show.add(rim);
   G3.fight=new T.Scene();
   G3.hemi=new T.HemisphereLight(0xffffff,0x444444,0.8);G3.fight.add(G3.hemi);
   G3.key=new T.DirectionalLight(0xffffff,0.9);G3.key.position.set(3,8,7);G3.fight.add(G3.key);
@@ -891,7 +891,36 @@ function buildModel(d){
   const shoe=M(g.sph,mt.shoe,13*u,6.5*u,7.5*u);shoe.position.set(5*u,-1*u,0);l.ft.add(shoe);
   m.leg[k]=l;
  }
+ bakeModel(m);
  return m;
+}
+/* unisce i pezzi fermi di un gruppo in un oggetto solo, con i colori sui vertici:
+   meno oggetti da disegnare = molto più fluido sui telefoni */
+function bake(group,mat,ok){
+ const ms=group.children.filter(o=>o.isMesh&&!o.isInstancedMesh&&!o.userData.keep&&(!ok||ok(o)));
+ if(!ms.length)return null;
+ const T=THREE,pos=[],nor=[],col=[],idx=[],v=new T.Vector3(),n=new T.Vector3(),nm=new T.Matrix3();let off=0;
+ for(const m of ms){
+  m.updateMatrix();nm.getNormalMatrix(m.matrix);
+  const g=m.geometry,P=g.attributes.position,N=g.attributes.normal,c=m.material.color;
+  for(let i=0;i<P.count;i++){
+   v.fromBufferAttribute(P,i).applyMatrix4(m.matrix);pos.push(v.x,v.y,v.z);
+   n.fromBufferAttribute(N,i).applyMatrix3(nm).normalize();nor.push(n.x,n.y,n.z);col.push(c.r,c.g,c.b);
+  }
+  if(g.index)for(let i=0;i<g.index.count;i++)idx.push(g.index.getX(i)+off);
+  else for(let i=0;i<P.count;i++)idx.push(i+off);
+  off+=P.count;group.remove(m);
+ }
+ const bg=new T.BufferGeometry();
+ bg.setAttribute('position',new T.Float32BufferAttribute(pos,3));bg.setAttribute('normal',new T.Float32BufferAttribute(nor,3));
+ bg.setAttribute('color',new T.Float32BufferAttribute(col,3));bg.setIndex(idx);
+ const out=new T.Mesh(bg,mat);group.add(out);return out;
+}
+function bakeModel(m){
+ const mat=new THREE.MeshToonMaterial({vertexColors:true});
+ m.face.mouth.userData.keep=true;for(const b of m.face.brows)b.userData.keep=true;
+ for(const g of[m.hip,m.torso,m.head,m.face.face,m.face.eyes,m.arm.f.sh,m.arm.f.el,m.arm.b.sh,m.arm.b.el,m.leg.f.hj,m.leg.f.kn,m.leg.f.ft,m.leg.b.hj,m.leg.b.kn,m.leg.b.ft])bake(g,mat);
+ m.mats=[mat];
 }
 function photoFace(m){
  const d=m.d,img=d.img;
@@ -908,14 +937,19 @@ function photoFace(m){
 }
 function poseModel(m,f){
  const P=pose(f),u=m.u,zs=f.facing>0?1:-1;
- const lh=a=>m.TH*Math.cos(a[0])+m.SH*Math.cos(a[1]);
- m.hip.position.set(P.hipX*u,Math.max(lh(P.lf),lh(P.lb),24*u)-P.bob*u,0);
- m.torso.rotation.z=-P.lean;
- m.headG.rotation.z=-P.lean*0.25;
- for(const[k,a]of[['f',P.af],['b',P.ab]]){const A=m.arm[k];A.sh.position.z=(k==='f'?1:-1)*zs*19*u;A.sh.rotation.z=a[0]+P.lean;A.el.rotation.z=a[1]-a[0]}
- for(const[k,a]of[['f',P.lf],['b',P.lb]]){const L=m.leg[k];L.hj.position.set((k==='f'?4:-4)*u,0,(k==='f'?1:-1)*zs*8.5*u);L.hj.rotation.z=a[0];L.kn.rotation.z=a[1]-a[0];L.ft.rotation.z=-a[1]}
+ // le articolazioni raggiungono la posa nuova in modo morbido invece di saltarci
+ const snap=m.owner!==f;m.owner=f;
+ const a=snap?1:0.45,S=(o,k,v)=>{o[k]=snap?v:o[k]+(v-o[k])*a};
+ const lh=q=>m.TH*Math.cos(q[0])+m.SH*Math.cos(q[1]);
+ m.hip.position.x=P.hipX*u;S(m.hip.position,'y',Math.max(lh(P.lf),lh(P.lb),24*u)-P.bob*u);
+ S(m.torso.rotation,'z',-P.lean);
+ S(m.headG.rotation,'z',-P.lean*0.25);
+ const arms=[[m.arm.f,P.af,1],[m.arm.b,P.ab,-1]];
+ for(const[A,q,sd]of arms){A.sh.position.z=sd*zs*19*u;S(A.sh.rotation,'z',q[0]+P.lean);S(A.el.rotation,'z',q[1]-q[0])}
+ const legs=[[m.leg.f,P.lf,1],[m.leg.b,P.lb,-1]];
+ for(const[L,q,sd]of legs){L.hj.position.set(sd*4*u,0,sd*zs*8.5*u);S(L.hj.rotation,'z',q[0]);S(L.kn.rotation,'z',q[1]-q[0]);S(L.ft.rotation,'z',-q[1])}
  if(m.badge)m.badge.position.z=zs*6*u;
- m.body.rotation.z=-P.rot;m.body.position.y=P.lift/f.s*u;
+ S(m.body.rotation,'z',-P.rot);S(m.body.position,'y',P.lift/f.s*u);
  const fp=m.face,R=m.R,mo=P.ko?'o':P.mouth;
  if(mo==='o')fp.mouth.scale.set(R*0.06,R*0.15,R*0.13);
  else if(mo==='grin')fp.mouth.scale.set(R*0.06,R*0.13,R*0.3);
@@ -954,7 +988,7 @@ function buildStage(i){
  const tex=new T.CanvasTexture(stageCanvas(STAGES[i]));tex.offset.set(0,1-575/720);tex.repeat.set(1,575/720);
  const bw=34,bh=bw*575/1280;
  add(M(g.plane,new T.MeshBasicMaterial({map:tex,fog:false}),bw,bh,1),0,bh/2-0.6,-9);
- const flm=i===2?new T.MeshPhongMaterial({map:floorTex(i),shininess:70,specular:0x664455}):new T.MeshLambertMaterial({map:floorTex(i)});
+ const flm=i===2?new T.MeshPhongMaterial({map:floorTex(i),shininess:40,specular:0x221822}):new T.MeshLambertMaterial({map:floorTex(i)});
  const fl=add(M(g.plane,flm,44,22,1),0,0,-1);fl.rotation.x=-Math.PI/2;
  const r=seeded(31+i);
  if(i===0){
@@ -1004,6 +1038,7 @@ function buildStage(i){
   for(const x of[-6.6,-6.2,6.3,6.7])add(M(g.cone,cone,0.17,0.5,0.17),x,0.25,1.9);
   for(const x of[-10.5,10.5]){add(M(g.cyl,tyre,0.07,4.2,0.07),x,2.1,-4.2);add(M(g.sphLo,light,0.22),x,4.25,-4.2)}
  }
+ bake(o,new T.MeshLambertMaterial({vertexColors:true}),x=>x.material.type==='MeshLambertMaterial'&&!x.material.map);
  return o;
 }
 function setStage(i){
@@ -1041,7 +1076,7 @@ function render3DFight(){
  let tx=clamp((mn+mx)/2,-3.3,3.3),td=clamp(span*0.85+4.8,5.4,arena?13.5:9);
  let orbit=0;
  if(F.phase==='intro'){const k=Math.min(1,F.pt/95);td+=(1-k)*4;orbit=(1-k)*0.7}
- if(F.phase==='ko'&&F.winner&&F.pt>70){tx=(F.winner.x-640)/100;td=4.4;orbit=0.25}
+ if(F.phase==='ko'&&F.winner&&F.pt>70){tx=(F.winner.x-640)/100;td=4.4;orbit=0.3*F.winner.facing}
  if(F.superT>0&&F.superF&&!arena){tx=(F.superF.x-640)/100;td=4.6;orbit=0.2*F.superF.facing}
  if(G3.cx===null){G3.cx=tx;G3.cd=td;G3.co=orbit}
  G3.cx=lerp(G3.cx,tx,0.08);G3.cd=lerp(G3.cd,td,0.06);G3.co=lerp(G3.co,orbit,0.06);
@@ -1132,7 +1167,8 @@ function applyHit(att,d,m,dir,proj,hy){
   dmg*=m.big?0.35:0.12;d.hp=Math.max(1,d.hp-dmg);d.vx=dir*(m.kb||5)*0.9;d.guardT=Math.round((m.stun||18)*0.6);
   if(!proj)att.hitLanded=true;
   att.meter=Math.min(100,att.meter+2);d.meter=Math.min(100,d.meter+4);
-  sparks(hx,hy,8,'#8fe3ff',false);SFX.block();d.hs=Math.max(d.hs,3);if(!proj)att.hs=Math.max(att.hs,3);
+  sparks(hx,hy,8,'#8fe3ff',false);SFX.block();
+  if(F.cfg.mode!=='arena'){d.hs=Math.max(d.hs,2);if(!proj)att.hs=Math.max(att.hs,2)}
   return;
  }
  dmg*=Math.pow(0.88,d.combo);d.hp-=dmg;d.combo++;
@@ -1146,7 +1182,8 @@ function applyHit(att,d,m,dir,proj,hy){
  else{d.state='hurt';d.st=0;d.stun=m.stun;d.vx=dir*m.kb}
  sparks(hx,hy,big?18:10,big?'#fff2a8':'#ffd32a',big);
  // fermo d'impatto solo per i due coinvolti, non per tutta la scena
- const hs=big?8:5;d.hs=Math.max(d.hs,hs);if(!proj)att.hs=Math.max(att.hs,hs);
+ // nell'arena nessun fermo: con tanti lottatori faceva andare il gioco a scatti
+ if(F.cfg.mode!=='arena'){const hs=big?5:3;d.hs=Math.max(d.hs,hs);if(!proj)att.hs=Math.max(att.hs,hs)}
  F.shake=Math.max(F.shake,(big?10:5)*(F.cfg.mode==='arena'?0.35:1));SFX.hit(m.dmg);
  if(d.combo>=2)F.combo={n:d.combo,att,t:70};
 }
