@@ -893,7 +893,7 @@ function buildModel(d){
   const t=M(g.box,mt.tie,2*u,TO*0.62,5*u);t.position.set(14.5*u,TO*0.55,0);m.torso.add(t);
   const col=M(g.box,mt.white,2*u,5*u,14*u);col.position.set(13.5*u,TO-4*u,0);m.torso.add(col);
  }else{m.badge=M(g.box,mt.white,1.5*u,11*u,8*u);m.badge.position.set(14.6*u,TO*0.6,6*u);m.torso.add(m.badge)}
- const neck=M(g.cyl,mt.skin,6*u,12*u,6*u);neck.position.y=TO+3*u;m.torso.add(neck);
+ const neck=M(g.cyl,mt.skin,6*u,12*u,6*u);neck.position.y=TO+3*u;neck.userData.keep=true;m.torso.add(neck);m.neck=neck;
  m.headG=new T.Group();m.headG.position.y=TO;m.torso.add(m.headG);
  m.head=new T.Group();m.head.position.y=R+3*u;m.headG.add(m.head);
  m.face=buildHead(m.head,d,R,mt);
@@ -1038,7 +1038,8 @@ function buildObj(type){
 function photoGeom(d,R){
  const img=d.img,v=d.viso||[0.5,0.5,0.8,0.85],fv=d.fv||1;
  const ch=R*2.35/v[3],cw=ch*img.naturalWidth/img.naturalHeight;
- return{ch,cw,fv,x:-(v[0]-0.5)*cw*fv+R*0.12,y:-R*0.95+(v[3]-0.5)*ch};
+ // il mento scende un po' sotto il punto del collo: il collo della foto entra nella maglietta
+ return{ch,cw,fv,x:-(v[0]-0.5)*cw*fv+R*0.12,y:-R*1.05+(v[3]-0.5)*ch};
 }
 function photoFace(m){
  const d=m.d,img=d.img;
@@ -1049,6 +1050,7 @@ function photoFace(m){
  const card=new THREE.Mesh(G3.g.plane,new THREE.MeshBasicMaterial({map:tex,alphaTest:0.45,side:THREE.DoubleSide}));
  card.scale.set(p.cw*p.fv,p.ch,1);card.position.set(p.x,p.y,0);
  for(const c of m.head.children)c.visible=false;
+ m.neck.visible=false;
  m.head.add(card);m.photo=card;m.photoTex=tex;
 }
 function poseModel(m,f){
@@ -1080,6 +1082,8 @@ function poseModel(m,f){
   const ext=e*190*u;fp.beard.scale.x=R*0.8+ext;fp.beard.position.x=R*0.22+ext;
  }
  photoFace(m);
+ // la sagoma resta dritta verso la telecamera (niente viso visto di sbieco)
+ if(m.photo)m.photo.rotation.y=f.facing>0?m.turn:-m.turn;
  if(m.photo)m.photo.material.color.setHex(f.flash>0?0xffffff:P.ko?0x9a9a9a:0xeeeeee);
  const fl=f.flash>0;
  if(fl!==m.flashOn){m.flashOn=fl;for(const mt of m.mats)mt.emissive.setHex(fl?0x888888:0x000000)}
@@ -1091,7 +1095,7 @@ function getModel(d,scene){
  const m=arr[n];if(m.root.parent!==scene)scene.add(m.root);m.root.visible=true;return m;
 }
 function place(m,f,x,y,sc,turn){
- m.root.position.set(x,y,0);m.root.scale.setScalar(sc);m.root.rotation.y=f.facing>0?-turn:Math.PI+turn;
+ m.root.position.set(x,y,0);m.root.scale.setScalar(sc);m.root.rotation.y=f.facing>0?-turn:Math.PI+turn;m.turn=turn;
  // Thomas: Mattia gira su sé stesso appoggiato sulle mani
  if(f.state==='attack'&&f.moveName==='thomas'&&f.st>=f.move.su&&f.st<f.move.su+f.move.act)m.root.rotation.y+=(f.st-f.move.su)*0.55;
  poseModel(m,f);
