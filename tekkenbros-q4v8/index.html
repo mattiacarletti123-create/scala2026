@@ -41,19 +41,19 @@ canvas{display:block;position:absolute;left:0;top:0}
    Il volto prende il posto della testa disegnata.
    ===================================================================== */
 const ROSTER=[
- {id:'alessandra',nome:'Alessandra',sopr:'',reparto:'Bros Manifatture',pelle:'#f1c27d',capelli:'#8e2a1b',taglio:'lunghi',barba:null,occhiali:false,maglia:'#e84393',pantaloni:'#1e272e',taglia:0.96,pot:0.95,vel:1.15,dif:0.95,spec:{nome:'Post Virale',em:'📣'},fin:{nome:'Lancio del Monitor',obj:'monitor',em:'🖥️'},frase:'Ti ho appena trasformato in un meme.',foto:null},
- {id:'mattia',nome:'Mattia',sopr:'',reparto:'Bros Manifatture',pelle:'#ffdbac',capelli:'#1b1b1b',taglio:'cresta',barba:null,occhiali:false,maglia:'#d63031',pantaloni:'#222222',taglia:1.0,pot:1.0,vel:1.1,dif:0.95,spec:{nome:'Pennellata Vettoriale',em:'🖌️'},fin:{nome:'Tastiera Volante',obj:'keyboard',em:'⌨️'},frase:'Ti ho scontornato.',foto:null},
- {id:'francesco',nome:'Francesco',sopr:'',reparto:'Bros Manifatture',pelle:'#e0ac69',capelli:'#2b1b0e',taglio:'corti',barba:null,occhiali:false,maglia:'#e67e22',pantaloni:'#2c3e50',taglia:1.1,pot:1.25,vel:0.85,dif:1.15,spec:{nome:'Pacco Express',em:'📦'},fin:{nome:'Lancio della Sedia',obj:'chair',em:'🪑'},frase:'Consegnato. Firma qui.',foto:null},
- {id:'paolo',nome:'Paolo',sopr:'',reparto:'Bros Manifatture',pelle:'#e8b98a',capelli:'#7f8c8d',taglio:'corti',barba:null,occhiali:true,maglia:'#0984e3',pantaloni:'#2d3436',taglia:1.05,pot:1.2,vel:0.9,dif:1.05,spec:{nome:'Chiave Inglese',em:'🔧'},fin:{nome:'Stampante Impazzita',obj:'printer',em:'🖨️'},frase:'Fatto a mano, come le botte.',foto:null},
- {id:'massi',nome:'Massi',sopr:'',reparto:'Bros Manifatture',pelle:'#c68642',capelli:'#1a1a1a',taglio:'calvo',barba:null,occhiali:false,maglia:'#f1c40f',pantaloni:'#34495e',taglia:1.08,pot:1.15,vel:0.95,dif:1.1,spec:{nome:'Bancale Volante',em:'🚚'},fin:{nome:'Cestino Pieno',obj:'bin',em:'🗑️'},frase:'Pratica chiusa.',foto:null},
- {id:'sabina',nome:'Sabina',sopr:'',reparto:'Bros Manifatture',pelle:'#f5d0a9',capelli:'#151515',taglio:'caschetto',barba:null,occhiali:true,maglia:'#6c5ce7',pantaloni:'#2d3436',taglia:0.95,pot:1.05,vel:1.0,dif:1.05,spec:{nome:'Fattura Scaduta',em:'🧾'},fin:{nome:'Raccoglitore del Bilancio',obj:'binder',em:'📒'},frase:'Questa te la metto a bilancio.',foto:null},
- {id:'enrico',nome:'Enrico',sopr:'',reparto:'Bros Manifatture',pelle:'#ffdbac',capelli:'#5a3a1a',taglio:'ricci',barba:null,occhiali:true,maglia:'#2d3436',pantaloni:'#636e72',taglia:1.0,pot:1.0,vel:1.05,dif:1.0,spec:{nome:'Riavvio Forzato',em:'💾'},fin:{nome:'Monitor Fuori Uso',obj:'monitor',em:'🖥️'},frase:'Hai provato a spegnere e riaccendere?',foto:null},
- {id:'silvia',nome:'Silvia',sopr:'',reparto:'Bros Manifatture',pelle:'#ffe0bd',capelli:'#d4a017',taglio:'coda',barba:null,occhiali:false,maglia:'#00b894',pantaloni:'#2d3436',taglia:0.95,pot:0.95,vel:1.15,dif:0.95,spec:{nome:"Lancio dell'Anello",em:'💍'},fin:{nome:'Sedia Girevole',obj:'chair',em:'🪑'},frase:'Contratto chiuso.',foto:null},
- {id:'laura',nome:'Laura',sopr:'',reparto:'Bros Manifatture',pelle:'#f3c9a0',capelli:'#4a2511',taglio:'lunghi',barba:null,occhiali:true,maglia:'#a29bfe',pantaloni:'#30336b',taglia:0.95,pot:1.0,vel:1.05,dif:1.05,spec:{nome:'Richiamo Scritto',em:'📋'},fin:{nome:'Boccione dell\'Acqua',obj:'bottle',em:'💧'},frase:'Ne riparliamo in riunione.',foto:null},
- {id:'daiana',nome:'Daiana',sopr:'',reparto:'Bros Manifatture',pelle:'#d9a066',capelli:'#2b1b0e',taglio:'ricci',barba:null,occhiali:false,maglia:'#00cec9',pantaloni:'#2d3436',taglia:0.95,pot:0.95,vel:1.1,dif:1.0,spec:{nome:'Chiamata in Attesa',em:'☎️'},fin:{nome:'Telefono Fisso',obj:'phone',em:'☎️'},frase:'La sua chiamata è importante per noi.',foto:null},
- {id:'martina',nome:'Martina',sopr:'',reparto:'Bros Manifatture',pelle:'#ffe0bd',capelli:'#b33939',taglio:'caschetto',barba:null,occhiali:false,maglia:'#fdcb6e',pantaloni:'#2d3436',taglia:0.95,pot:1.05,vel:1.05,dif:1.0,spec:{nome:'Scarto di Produzione',em:'🔍'},fin:{nome:'Pianta da Ufficio',obj:'plant',em:'🪴'},frase:'Non conforme. Scartato.',foto:null},
- {id:'valentina',nome:'Valentina',sopr:'',reparto:'Bros Manifatture',pelle:'#f1c27d',capelli:'#3d2314',taglio:'coda',barba:null,occhiali:false,maglia:'#16a085',pantaloni:'#1e272e',taglia:0.97,pot:1.0,vel:1.1,dif:1.0,spec:{nome:'Caffè Bollente',em:'☕'},fin:{nome:'Macchina del Caffè',obj:'coffee',em:'☕'},frase:'Il caffè lo offri tu.',foto:null},
- {id:'saverio',nome:'Saverio',sopr:'',reparto:'Bros Manifatture',pelle:'#e0ac69',capelli:'#9aa0a6',taglio:'corti',barba:null,occhiali:false,maglia:'#2f3640',pantaloni:'#2f3640',taglia:1.1,pot:1.2,vel:1.0,dif:1.2,spec:{nome:'Valigetta',em:'💼'},fin:{nome:'Scrivania Intera',obj:'desk',em:'🗄️'},frase:'Domattina alle nove, puntuale.',foto:null}
+ {id:'alessandra',nome:'Alessandra',sopr:'',reparto:'Bros Manifatture',pelle:'#f1c27d',capelli:'#8e2a1b',taglio:'lunghi',barba:null,occhiali:false,maglia:'#e84393',pantaloni:'#1e272e',taglia:0.96,pot:0.95,vel:1.15,dif:0.95,spec:{nome:'Post Virale',em:'📣'},fin:{nome:'Lancio del Mouse',tipo:'obj',obj:'mouse',em:'🖱️'},frase:'Ti ho appena trasformato in un meme.',foto:null},
+ {id:'mattia',nome:'Mattia',sopr:'',reparto:'Bros Manifatture',pelle:'#ffdbac',capelli:'#1b1b1b',taglio:'cresta',barba:null,occhiali:false,maglia:'#d63031',pantaloni:'#222222',taglia:1.0,pot:1.0,vel:1.1,dif:0.95,spec:{nome:'Pennellata Vettoriale',em:'🖌️'},fin:{nome:'Thomas Breakdance',tipo:'thomas',em:'🕺'},frase:'Ti ho scontornato.',foto:null},
+ {id:'francesco',nome:'Francesco',sopr:'',reparto:'Bros Manifatture',pelle:'#e0ac69',capelli:'#2b1b0e',taglio:'calvo',barba:'barba',occhiali:false,maglia:'#e67e22',pantaloni:'#2c3e50',taglia:1.1,pot:1.25,vel:0.85,dif:1.15,spec:{nome:'Pacco Express',em:'📦'},fin:{nome:'Colpo del Sole',tipo:'sole',em:'☀️'},frase:'Consegnato. Firma qui.',foto:null},
+ {id:'paolo',nome:'Paolo',sopr:'',reparto:'Bros Manifatture',pelle:'#e8b98a',capelli:'#7f8c8d',taglio:'corti',barba:null,occhiali:true,maglia:'#0984e3',pantaloni:'#2d3436',taglia:1.05,pot:1.2,vel:0.9,dif:1.05,spec:{nome:'Chiave Inglese',em:'🔧'},fin:{nome:'Lancio del PC',tipo:'obj',obj:'pc',em:'🖥️'},frase:'Fatto a mano, come le botte.',foto:null},
+ {id:'massi',nome:'Massi',sopr:'',reparto:'Bros Manifatture',pelle:'#c68642',capelli:'#1a1a1a',taglio:'calvo',barba:null,occhiali:false,maglia:'#f1c40f',pantaloni:'#34495e',taglia:1.08,pot:1.15,vel:0.95,dif:1.1,spec:{nome:'Bancale Volante',em:'🚚'},fin:{nome:'Lancio della Sedia',tipo:'obj',obj:'chair',em:'🪑'},frase:'Pratica chiusa.',foto:null},
+ {id:'sabina',nome:'Sabina',sopr:'',reparto:'Bros Manifatture',pelle:'#f5d0a9',capelli:'#151515',taglio:'caschetto',barba:null,occhiali:true,maglia:'#6c5ce7',pantaloni:'#2d3436',taglia:0.95,pot:1.05,vel:1.0,dif:1.05,spec:{nome:'Fattura Scaduta',em:'🧾'},fin:{nome:'Bottiglie di Vino',tipo:'multi',obj:'wine',n:3,em:'🍷'},frase:'Questa te la metto a bilancio.',foto:null},
+ {id:'enrico',nome:'Enrico',sopr:'',reparto:'Bros Manifatture',pelle:'#ffdbac',capelli:'#5a3a1a',taglio:'ricci',barba:'barba',occhiali:true,maglia:'#2d3436',pantaloni:'#636e72',taglia:1.0,pot:1.0,vel:1.05,dif:1.0,spec:{nome:'Riavvio Forzato',em:'💾'},fin:{nome:'Barba Allungabile',tipo:'barba',em:'🧔'},frase:'Hai provato a spegnere e riaccendere?',foto:null},
+ {id:'silvia',nome:'Silvia',sopr:'',reparto:'Bros Manifatture',pelle:'#ffe0bd',capelli:'#d4a017',taglio:'coda',barba:null,occhiali:false,maglia:'#00b894',pantaloni:'#2d3436',taglia:0.95,pot:0.95,vel:1.15,dif:0.95,spec:{nome:"Lancio dell'Anello",em:'💍'},fin:{nome:'Pioggia di Mozzarelle',tipo:'multi',obj:'mozzarella',n:5,em:'⚪'},frase:'Contratto chiuso.',foto:null},
+ {id:'laura',nome:'Laura',sopr:'',reparto:'Bros Manifatture',pelle:'#f3c9a0',capelli:'#4a2511',taglio:'lunghi',barba:null,occhiali:true,maglia:'#a29bfe',pantaloni:'#30336b',taglia:0.95,pot:1.0,vel:1.05,dif:1.05,spec:{nome:'Richiamo Scritto',em:'📋'},fin:{nome:'Lancio della Sedia',tipo:'obj',obj:'chair',em:'🪑'},frase:'Ne riparliamo in riunione.',foto:null},
+ {id:'daiana',nome:'Daiana',sopr:'',reparto:'Bros Manifatture',pelle:'#d9a066',capelli:'#2b1b0e',taglio:'ricci',barba:null,occhiali:false,maglia:'#00cec9',pantaloni:'#2d3436',taglia:0.95,pot:0.95,vel:1.1,dif:1.0,spec:{nome:'Chiamata in Attesa',em:'☎️'},fin:{nome:'Telefono Fisso',tipo:'obj',obj:'phone',em:'☎️'},frase:'La sua chiamata è importante per noi.',foto:null},
+ {id:'martina',nome:'Martina',sopr:'',reparto:'Bros Manifatture',pelle:'#ffe0bd',capelli:'#b33939',taglio:'caschetto',barba:null,occhiali:false,maglia:'#fdcb6e',pantaloni:'#2d3436',taglia:0.95,pot:1.05,vel:1.05,dif:1.0,spec:{nome:'Scarto di Produzione',em:'🔍'},fin:{nome:'Pianta da Ufficio',tipo:'obj',obj:'plant',em:'🪴'},frase:'Non conforme. Scartato.',foto:null},
+ {id:'valentina',nome:'Valentina',sopr:'',reparto:'Bros Manifatture',pelle:'#f1c27d',capelli:'#3d2314',taglio:'coda',barba:null,occhiali:false,maglia:'#16a085',pantaloni:'#1e272e',taglia:0.97,pot:1.0,vel:1.1,dif:1.0,spec:{nome:'Caffè Bollente',em:'☕'},fin:{nome:'Macchina del Caffè',tipo:'obj',obj:'coffee',em:'☕'},frase:'Il caffè lo offri tu.',foto:null},
+ {id:'saverio',nome:'Saverio',sopr:'',reparto:'Bros Manifatture',pelle:'#e0ac69',capelli:'#9aa0a6',taglio:'corti',barba:null,occhiali:false,maglia:'#2f3640',pantaloni:'#2f3640',taglia:1.1,pot:1.2,vel:1.0,dif:1.2,spec:{nome:'Valigetta',em:'💼'},fin:{nome:'Lancio dei Gatti',tipo:'multi',obj:'cat',n:3,em:'🐈'},frase:'Domattina alle nove, puntuale.',foto:null}
 ];
 const BOSS=null;
 
@@ -276,7 +276,10 @@ const MOSSE={
  airpunch:{su:3,act:7,rec:4, dmg:6,reach:66,hy:105,hh:50,kb:4,stun:16,air:true},
  airkick: {su:5,act:10,rec:4,dmg:8,reach:80,hy:32, hh:64,kb:6,stun:18,air:true},
  special: {su:13,act:1,rec:16,proj:'small'},
- super:   {su:8,act:1,rec:22,proj:'big'}
+ super:   {su:8,act:1,rec:22,proj:'big'},
+ // mosse finali corpo a corpo
+ thomas:  {su:8,act:48,rec:16,dmg:6,reach:0,hy:60,hh:80,kb:3,stun:16,box:'around',multi:12},
+ barba:   {su:12,act:14,rec:20,dmg:22,reach:380,hy:140,hh:50,kb:9,stun:22,kd:true,big:true,grow:true}
 };
 const TAGCOL=['#2ed573','#ffa502','#a55eea','#eccc68','#7bed9f','#70a1ff','#ff6b81'];
 
@@ -295,7 +298,12 @@ class Fighter{
  get grounded(){return this.y>=GROUND-0.01}
  get alive(){return this.state!=='ko'}
  body(){const s=this.s;return{x:this.x-26*s,y:this.y-195*s,w:52*s,h:195*s}}
- hitbox(){const m=this.move,s=this.s,x0=this.facing>0?this.x+10*s:this.x-10*s-m.reach*s;return{x:x0,y:this.y-m.hy*s-m.hh*s/2,w:m.reach*s,h:m.hh*s}}
+ hitbox(){
+  const m=this.move,s=this.s;
+  if(m.box==='around')return{x:this.x-95*s,y:this.y-85*s,w:190*s,h:85*s};
+  const reach=m.grow?60+(m.reach-60)*clamp((this.st-m.su+1)/5,0,1):m.reach;
+  const x0=this.facing>0?this.x+10*s:this.x-10*s-reach*s;return{x:x0,y:this.y-m.hy*s-m.hh*s/2,w:reach*s,h:m.hh*s};
+ }
  feed(I){
   this.input=I;
   if(I.punch){this.buffer='punch';this.bufT=8}
@@ -308,13 +316,19 @@ class Fighter{
   if(this.grounded)this.vx=(this.move.step||0)*this.facing;
  }
  trySpecial(g){
-  if(this.meter>=100){this.meter=0;this.startAttack('super');g.superStart(this);return true}
+  if(this.meter>=100){const t=this.def.fin.tipo;this.meter=0;this.startAttack(t==='thomas'||t==='barba'?t:'super');g.superStart(this);return true}
   if(this.meter>=25){this.meter-=25;this.startAttack('special');SFX.special();return true}
   if(!this.cpu)SFX.nope();
   return false;
  }
  launch(g,big){
-  const s=this.s;
+  const s=this.s,fin=this.def.fin;
+  if(big&&fin.tipo==='sole'){g.solar(this);return}
+  if(big&&fin.tipo==='multi'){
+   for(let i=0;i<fin.n;i++)g.proj.push({id:++AID,x:this.x+this.facing*50*s,y:this.y-140*s,vx:this.facing*(6.5+i*1.7),vy:-8+i*0.9,g:0.32,
+    owner:this,size:72,r:26,dmg:12,big:true,rot:i*1.3,life:240});
+   return;
+  }
   g.proj.push({id:++AID,x:this.x+this.facing*55*s,y:this.y-128*s,vx:this.facing*(big?10:9),owner:this,em:this.def.spec.em,
    size:big?120:50,r:big?48:20,dmg:big?24:10,big,rot:0,life:240});
  }
@@ -347,7 +361,9 @@ class Fighter{
     if(m.proj){if(this.st===m.su)this.launch(g,m.proj==='big')}
     else{
      if(this.st===m.su)SFX.whoosh();
-     if(this.st>=m.su&&this.st<m.su+m.act)g.checkHits(this);
+     const on=this.st>=m.su&&this.st<m.su+m.act;
+     if(on&&m.multi){if((this.st-m.su)%m.multi===0){this.hitIds.clear();if(this.st>m.su)SFX.whoosh()}this.vx=this.facing*3.5}
+     if(on)g.checkHits(this);
     }
     if(this.st>=m.su+m.act+rec){this.state=this.grounded?'idle':'jump';this.move=null;this.chain=0;this.st=0}
     break;
@@ -415,15 +431,16 @@ class CPU{
   if(--this.cool<=0){
    const react=Math.round(30-L*22);this.cool=react+Math.random()*react;
    const r=Math.random();this.plan=null;
-   if(f.meter>=100&&dist>180&&r<0.5+L*0.3)this.queue=['special'];
+   const ft=f.def.fin.tipo,finOk=ft==='thomas'?dist<140:ft==='barba'?dist>90&&dist<360:dist>170;
+   if(f.meter>=100&&finOk&&r<0.5+L*0.3)this.queue=['special'];
    else if(dist>330){
-    if(f.meter>=25&&r<0.25+L*0.15)this.queue=['special'];
+    if(f.meter>=25&&f.meter<100&&r<0.25+L*0.15)this.queue=['special'];
     else if(Math.random()<0.1)this.plan='jumpin';
     else{this.plan='app';this.planT=20+Math.random()*30}
    }else if(dist>115){
     if(r<0.65){this.plan='app';this.planT=15+Math.random()*20}
     else if(r<0.8){this.plan='ret';this.planT=15}
-    else if(f.meter>=25&&r<0.9)this.queue=['special'];
+    else if(f.meter>=25&&f.meter<100&&r<0.9)this.queue=['special'];
     else this.plan='jumpin';
    }else{
     if(r<0.42)this.queue=['punch'];
@@ -468,7 +485,17 @@ function pose(f){
     case 'kick':P.lf=[lerp(0.45,1.62,ep),lerp(-0.05,1.6,ep)];P.lb=[-0.1,-0.3];P.lean=0.08-ep*0.4;P.af=[0.9,1.9];P.ab=[-0.6,0.9];break;
     case 'airpunch':P.lf=[1.1,-0.3];P.lb=[0.5,-0.7];P.af=[lerp(0.8,1.2,ep),lerp(2.4,1.15,ep)];P.ab=[0.6,2.4];break;
     case 'airkick':P.lf=[lerp(1.1,1.0,ep),lerp(-0.3,0.95,ep)];P.lb=[0.5,-0.6];P.af=[1.6,2.6];P.ab=[-0.4,0.6];P.lean=-0.25*ep;break;
+    case 'thomas':{ // breakdance: mani a terra, gambe aperte che girano
+     const k=st<m.su?st/m.su:st<m.su+m.act?1:Math.max(0,1-(st-m.su-m.act)/rec),w=Math.sin(t*0.5)*0.25;
+     P.lean=1.25*k;P.af=[lerp(0.5,0.05,k),lerp(2.5,0,k)];P.ab=[lerp(0.2,-0.05,k),lerp(2.2,0,k)];
+     P.lf=[lerp(0.45,1.75+w,k),lerp(-0.05,1.8+w,k)];P.lb=[lerp(-0.15,-1.75+w,k),lerp(-0.45,-1.8+w,k)];
+     P.bob=-Math.abs(Math.sin(t*0.5))*6*k;P.mouth='grin';P.brow=0;break;
+    }
+    case 'barba':P.lean=st<m.su?-0.15*st/m.su:-0.1;P.af=[-0.5,0.3];P.ab=[-0.8,0.2];P.lf=[0.6,0.05];P.lb=[-0.4,-0.5];P.mouth='grin';break;
     default:{ // speciale / super: lancio
+     if(f.moveName==='super'&&f.def.fin.tipo==='sole'){ // colpo del sole: china la testa pelata verso l'avversario
+      const k=st<m.su?st/m.su:Math.max(0,1-(st-m.su)/rec);P.lean=0.55*k;P.af=[-0.9*k,-0.4*k];P.ab=[-1.1*k,-0.6*k];P.lf=[0.6,0.05];P.mouth='grin';break;
+     }
      if(st<m.su){const w=st/m.su;P.af=[lerp(0.5,-2.3,w),lerp(2.5,-2.6,w)];P.lean=-0.18*w}
      else{const r=Math.max(0,1-(st-m.su)/rec);P.af=[lerp(0.6,1.5,r),lerp(1.2,1.45,r)];P.lean=0.28*r}
      P.lf=[0.65,0.05];P.mouth='grin';
@@ -623,9 +650,11 @@ function drawFighter(f,shadow=true){
   ctx.fillStyle='rgba(0,0,0,0.35)';ctx.beginPath();ctx.ellipse(f.x,gy+3,44*s*k,9*s*k,0,0,Math.PI*2);ctx.fill();
  }
  ctx.save();ctx.translate(f.x,f.y-P.lift);if(P.rot)ctx.rotate(P.rot*f.facing);
- if(f.flash>0)ctx.filter='brightness(2.3)';
  if(f.invul>0&&f.state!=='win'&&(f.invul>>2)%2)ctx.globalAlpha=0.55;
+ const spin=f.state==='attack'&&f.moveName==='thomas'&&f.st>=f.move.su&&((f.st>>2)&1),fc=f.facing;
+ if(spin)f.facing=-fc;
  drawBody(f,P);
+ f.facing=fc;
  ctx.restore();
 }
 function drawBust(d,x,y,R){
@@ -838,7 +867,7 @@ function buildHead(h,d,R,mt){
   }
  }
  if(t==='cresta'){for(let i=0;i<5;i++){const c=M(g.cone,hm,R*0.16,R*0.55,R*0.16);c.position.set(R*(0.45-i*0.27),R*1.12-Math.abs(i-2)*R*0.06,0);c.rotation.z=0.3;h.add(c)}}
- if(d.barba==='barba'){const b=M(g.sph,hm,R*0.8,R*0.55,R*0.88);b.position.set(R*0.22,-R*0.5,0);f.face.add(b);f.mouth.position.x=R*0.98}
+ if(d.barba==='barba'){const b=M(g.sph,hm,R*0.8,R*0.55,R*0.88);b.position.set(R*0.22,-R*0.5,0);b.userData.keep=true;f.face.add(b);f.beard=b;f.mouth.position.x=R*0.98}
  if(d.barba==='baffi'){const b=M(g.box,hm,R*0.08,R*0.1,R*0.45);b.position.set(R*0.95,-R*0.3,0);f.face.add(b)}
  if(d.occhiali){
   for(const z of[-1,1]){const r=M(g.torus,mt.black,R*0.23);r.rotation.y=Math.PI/2;r.position.set(R*0.98,R*0.12,z*R*0.34);f.face.add(r)}
@@ -966,6 +995,32 @@ function buildObj(type){
    add(M(g.box,L('#636e72'),0.62,0.85,0.55),0,0,0);add(M(g.box,dark,0.5,0.3,0.02),0,0.18,0.28);
    add(M(g.cyl,white,0.09,0.13,0.09),0,-0.28,0.22);add(M(g.cyl,L('#6d4c41'),0.08,0.01,0.08),0,-0.21,0.22);
    add(M(g.sphLo,L('#e74c3c'),0.05),0.2,0.37,0.28);break;
+  case 'mouse':
+   add(M(g.sph,L('#dfe6e9'),0.5,0.24,0.32),0,0,0);add(M(g.box,dark,0.02,0.05,0.3),0.15,0.2,0);
+   add(M(g.cyl,dark,0.05,0.04,0.05),0.22,0.21,0,Math.PI/2);
+   for(let i=0;i<4;i++)add(M(g.cyl,dark,0.025,0.22,0.025),0.55+i*0.18,-0.02+Math.sin(i)*0.05,0,0,Math.PI/2+Math.sin(i*1.7)*0.4);
+   break;
+  case 'pc':
+   add(M(g.box,L('#2d3436'),0.42,1.0,0.9),0,0,0);add(M(g.box,L('#636e72'),0.02,0.95,0.84),0.22,0,0);
+   for(let i=0;i<2;i++)add(M(g.box,dark,0.01,0.08,0.6),0.235,0.32-i*0.12,0);
+   add(M(g.cyl,new THREE.MeshBasicMaterial({color:0x4aa3ff}),0.04,0.01,0.04),0.24,-0.3,0,0,Math.PI/2);
+   for(let i=0;i<6;i++)add(M(g.box,dark,0.01,0.02,0.5),0.235,-0.05-i*0.05,0);
+   break;
+  case 'mozzarella':
+   add(M(g.sph,L('#fbfbf2'),0.42,0.36,0.42),0,0,0);add(M(g.sphLo,L('#f1efe0'),0.12,0.1,0.12),0,0.36,0);
+   add(M(g.sphLo,L('#e8e6d4'),0.07),0,0.46,0);break;
+  case 'wine':
+   add(M(g.cyl,L('#1e4d2b'),0.16,0.62,0.16),0,-0.12,0);add(M(g.sph,L('#1e4d2b'),0.16,0.12,0.16),0,0.19,0);
+   add(M(g.cyl,L('#1e4d2b'),0.065,0.3,0.065),0,0.38,0);add(M(g.cyl,L('#7b1e2b'),0.07,0.1,0.07),0,0.55,0);
+   add(M(g.cyl,L('#f5ecd7'),0.165,0.22,0.165),0,-0.12,0);add(M(g.cyl,L('#7b1e2b'),0.166,0.05,0.166),0,-0.05,0);break;
+  case 'cat':{
+   const fur=L('#e67e22'),wh=L('#fdf2e3');
+   add(M(g.sph,fur,0.42,0.24,0.24),0,0,0);add(M(g.sph,fur,0.21,0.2,0.21),0.42,0.16,0);add(M(g.sph,wh,0.09,0.08,0.12),0.58,0.1,0);
+   for(const z of[-0.1,0.1]){add(M(g.cone,fur,0.07,0.14,0.07),0.4,0.36,z);add(M(g.sphLo,dark,0.03),0.6,0.2,z*0.8)}
+   for(const x of[-0.25,0.25])for(const z of[-0.12,0.12])add(M(g.cyl,fur,0.05,0.24,0.05),x,-0.22,z);
+   add(M(g.cyl,fur,0.045,0.45,0.045),-0.5,0.17,0,0,0.9);
+   for(let i=0;i<3;i++)add(M(g.box,L('#c0601a'),0.05,0.2,0.26),-0.15+i*0.15,0.12,0);
+   break;}
   case 'desk':
    add(M(g.box,L('#d9d4c7'),1.7,0.08,0.8),0,0.2,0);
    for(const x of[-0.78,0.78])for(const z of[-0.33,0.33])add(M(g.box,dark,0.07,0.7,0.07),x,-0.18,z);
@@ -1010,6 +1065,12 @@ function poseModel(m,f){
  else fp.mouth.scale.set(R*0.06,R*0.045,R*0.26);
  fp.eyes.scale.y=P.ko?0.18:1;
  for(const b of fp.brows)b.rotation.x=-b.userData.z*P.brow*0.4;
+ if(fp.beard){
+  // Barba Allungabile: la barba cresce in avanti fino a colpire
+  let e=0;
+  if(f.state==='attack'&&f.moveName==='barba'){const mv=f.move,st=f.st,rec=Math.round(mv.rec/f.def.vel);e=st<mv.su?0.05*st/mv.su:st<mv.su+mv.act?clamp((st-mv.su+1)/5,0,1):Math.max(0,1-(st-mv.su-mv.act)/rec)}
+  const ext=e*190*u;fp.beard.scale.x=R*0.8+ext;fp.beard.position.x=R*0.22+ext;
+ }
  photoFace(m);
  const fl=f.flash>0;
  if(fl!==m.flashOn){m.flashOn=fl;for(const mt of m.mats)mt.emissive.setHex(fl?0x888888:0x000000)}
@@ -1020,7 +1081,12 @@ function getModel(d,scene){
  const arr=G3.pool[d.id]||(G3.pool[d.id]=[]);if(!arr[n])arr[n]=buildModel(d);
  const m=arr[n];if(m.root.parent!==scene)scene.add(m.root);m.root.visible=true;return m;
 }
-function place(m,f,x,y,sc,turn){m.root.position.set(x,y,0);m.root.scale.setScalar(sc);m.root.rotation.y=f.facing>0?-turn:Math.PI+turn;poseModel(m,f)}
+function place(m,f,x,y,sc,turn){
+ m.root.position.set(x,y,0);m.root.scale.setScalar(sc);m.root.rotation.y=f.facing>0?-turn:Math.PI+turn;
+ // Thomas: Mattia gira su sé stesso appoggiato sulle mani
+ if(f.state==='attack'&&f.moveName==='thomas'&&f.st>=f.move.su&&f.st<f.move.su+f.move.act)m.root.rotation.y+=(f.st-f.move.su)*0.55;
+ poseModel(m,f);
+}
 function emojiTex(em){
  if(G3.emo[em])return G3.emo[em];
  const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
@@ -1196,7 +1262,7 @@ function goVS(cfg){scene='vs';VS={cfg,t:0};SFX.ok()}
 function startFight(cfg){
  F={cfg,fighters:[],proj:[],parts:[],round:1,wins:[0,0],timer:60,phase:'intro',pt:0,hitstopT:0,shake:0,banner:null,
     superT:0,superF:null,combo:null,stage:STAGES[cfg.stage],paused:false,pi:0,winner:null,timeup:false,flashT:0,spect:false,
-    checkHits,applyHit,superStart,dust};
+    checkHits,applyHit,superStart,dust,solar,beams:[]};
  spawn();scene='fight';audioUnlock();musicStart();G3.cx=null;
 }
 function spawn(){
@@ -1209,7 +1275,7 @@ function spawn(){
   else{f.color=slot===0?'#ff4757':'#1e90ff';f.label=c.mode==='online'?(slot===myIdx()?'TU':'RIVALE'):slot===0?'1P':'2P'}
   return f;
  });
- F.proj=[];F.parts=[];F.phase='intro';F.pt=0;F.timer=60;F.timeup=false;F.winner=null;F.combo=null;F.banner=null;F.spect=false;F.superT=0;
+ F.proj=[];F.parts=[];F.beams=[];F.phase='intro';F.pt=0;F.timer=60;F.timeup=false;F.winner=null;F.combo=null;F.banner=null;F.spect=false;F.superT=0;
 }
 function banner(text,dur=60,col='#fff',sub=''){F.banner={text,t:0,dur,col,sub}}
 
@@ -1237,7 +1303,7 @@ function applyHit(att,d,m,dir,proj,hy){
  if(!proj)att.hitLanded=true;
  d.flash=6;att.meter=Math.min(100,att.meter+7);d.meter=Math.min(100,d.meter+5);
  const big=m.big||m.dmg>=9;
- const kd=m.kd||!d.grounded;
+ const kd=m.kd||!d.grounded||(!proj&&m.multi&&att.st>=m.su+m.act-m.multi);
  d.move=null;d.guardT=0;
  if(d.hp<=0){d.hp=0;d.state='ko';d.st=0;d.vy=-13;d.vx=dir*9;d.y-=1;onKO(d,att)}
  else if(kd){d.state='down';d.st=0;d.lie=0;d.vy=-10;d.vx=dir*7;d.y-=1}
@@ -1251,6 +1317,17 @@ function applyHit(att,d,m,dir,proj,hy){
 function superStart(f){
  F.superT=55;F.superF=f;SFX.sup();say(f.def.fin.nome,'it-IT',1.05,0.8);
  for(let i=0;i<30;i++)F.parts.push({type:'spark',x:f.x,y:f.y-120*f.s,vx:rnd(-9,9),vy:rnd(-9,9),life:30,max:30,col:'#fff',size:3});
+}
+/* colpo del sole: dalla testa pelata parte un riflesso che stende chi sta davanti */
+function solar(f){
+ const dir=f.facing,s=f.s;
+ F.beams.push({x:f.x+dir*25*s,y:f.y-175*s,dir,t:28});
+ for(const d of F.fighters){
+  if(d===f||!d.alive||d.state==='down'||d.state==='getup'||d.invul>0)continue;
+  const dx=(d.x-f.x)*dir;
+  if(dx>0&&dx<1100&&Math.abs(d.y-f.y)<170)applyHit(f,d,{dmg:22,kb:9,stun:22,kd:true,big:true},dir,true,d.y-150*d.s);
+ }
+ F.flashT=Math.max(F.flashT,6);SFX.special();
 }
 function onKO(d,att){
  if(F.cfg.mode==='arena'&&F.fighters.filter(f=>f.alive).length>1){F.shake=Math.max(F.shake,6)}
@@ -1304,6 +1381,7 @@ function fightStep(){
  // proiettili
  for(const p of F.proj){
   p.x+=p.vx;p.rot+=0.15*Math.sign(p.vx);p.life--;
+  if(p.g){p.vy+=p.g;p.y+=p.vy;if(p.y>GROUND-14){p.dead=true;dust(p.x,5);continue}}
   if(p.x<-150||p.x>W+150||p.life<=0){p.dead=true;continue}
   if(F.pt%2===0)F.parts.push({type:'spark',x:p.x-p.vx*2,y:p.y+rnd(-8,8),vx:-p.vx*0.2,vy:rnd(-1,1),life:14,max:14,col:p.big?'#ffd32a':'#fff',size:p.big?4:2});
   for(const f of F.fighters){
@@ -1347,6 +1425,7 @@ function fightStep(){
   }
  }
  updParts();
+ for(const b of F.beams)b.t--;F.beams=F.beams.filter(b=>b.t>0);
  if(F.shake>0)F.shake*=0.85;if(F.shake<0.5)F.shake=0;
 }
 function updParts(){
@@ -1392,6 +1471,7 @@ function makeSnap(){
   wn:F.winner?fs.indexOf(F.winner):-1,pf:!!F.perfect,
   f:fs.map(f=>[r1(f.x),r1(f.y),f.facing,f.state,f.st,Math.round(f.anim),r1(f.hp),r1(f.shownHp),r1(f.meter),f.moveName,f.flash,f.invul,f.guardT,r1(f.vy),f.combo]),
   p:F.proj.map(p=>[r1(p.x),r1(p.y),r1(p.rot),p.size,fs.indexOf(p.owner),p.big]),
+  bm:F.beams.map(b=>[Math.round(b.x),Math.round(b.y),b.dir,b.t]),
   ev:NET.ev.splice(0)};
 }
 function applySnap(m){
@@ -1407,6 +1487,7 @@ function applySnap(m){
   if(f.state==='attack'&&!f.move)f.state='idle';
  });
  F.proj=m.p.map(a=>({x:a[0],y:a[1],rot:a[2],size:a[3],owner:fs[a[4]]||fs[0],big:a[5]}));
+ F.beams=(m.bm||[]).map(a=>({x:a[0],y:a[1],dir:a[2],t:a[3]}));
  for(const e of m.ev){
   if(e[0]==='x'&&SFX[e[1]])SFX[e[1]](e[2]);
   else if(e[0]==='v')say(e[1],e[2],e[3],e[4]);
@@ -1949,6 +2030,21 @@ function drawFight(){
   else{ctx.fillStyle=p.col;circle(s.x,s.y,p.size*k*(p.type==='dust'?(1.5-a):a+0.3))}
  }
  ctx.globalAlpha=1;
+ // colpo del sole: la testa si illumina, poi parte il riflesso
+ for(const f of F.fighters){
+  if(f.state!=='attack'||f.moveName!=='super'||f.def.fin.tipo!=='sole'||f.st>f.move.su+4)continue;
+  const h=at(f.x+f.facing*20*f.s,f.y-178*f.s),r=(18+f.st*5)*k;
+  const gr=ctx.createRadialGradient(h.x,h.y,0,h.x,h.y,r);gr.addColorStop(0,'rgba(255,255,230,0.95)');gr.addColorStop(1,'rgba(255,230,120,0)');
+  ctx.fillStyle=gr;ctx.beginPath();ctx.arc(h.x,h.y,r,0,Math.PI*2);ctx.fill();
+ }
+ for(const b of F.beams){
+  const a=b.t/28,p0=at(b.x,b.y),p1=at(b.x+b.dir*1150,b.y),w=(70*a+10)*k;
+  ctx.save();ctx.lineCap='round';
+  ctx.strokeStyle=`rgba(255,220,90,${0.45*a})`;ctx.lineWidth=w*1.8;ctx.beginPath();ctx.moveTo(p0.x,p0.y);ctx.lineTo(p1.x,p1.y);ctx.stroke();
+  ctx.strokeStyle=`rgba(255,250,220,${0.9*a})`;ctx.lineWidth=w*0.6;ctx.stroke();
+  ctx.fillStyle=`rgba(255,255,240,${a})`;ctx.beginPath();ctx.arc(p0.x,p0.y,w*0.9,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+ }
  if(!g3)ctx.restore();
  if(F.cfg.mode==='arena')hudArena();else hudDuel();
  if(F.combo){
