@@ -41,9 +41,9 @@ canvas{display:block;position:absolute;left:0;top:0}
    Il volto prende il posto della testa disegnata.
    ===================================================================== */
 const ROSTER=[
- {id:'alessandra',nome:'Alessandra',sopr:'',reparto:'Bros Manifatture',pelle:'#f1c27d',capelli:'#8e2a1b',taglio:'lunghi',barba:null,occhiali:false,maglia:'#e84393',pantaloni:'#1e272e',taglia:0.96,pot:0.95,vel:1.15,dif:0.95,spec:{nome:'Post Virale',em:'📣'},fin:{nome:'Lancio del Mouse',tipo:'obj',obj:'mouse',em:'🖱️'},frase:'Ti ho appena trasformato in un meme.',foto:'volti/ritagli/alessandra.png',fv:1},
- {id:'mattia',nome:'Mattia',sopr:'',reparto:'Bros Manifatture',pelle:'#ffdbac',capelli:'#1b1b1b',taglio:'cresta',barba:null,occhiali:false,maglia:'#d63031',pantaloni:'#222222',taglia:1.0,pot:1.0,vel:1.1,dif:0.95,spec:{nome:'Pennellata Vettoriale',em:'🖌️'},fin:{nome:'Thomas Breakdance',tipo:'thomas',em:'🕺'},frase:'Ti ho scontornato.',foto:'volti/ritagli/mattia.png',fv:-1},
- {id:'francesco',nome:'Francesco',sopr:'',reparto:'Bros Manifatture',pelle:'#e0ac69',capelli:'#2b1b0e',taglio:'calvo',barba:'barba',occhiali:false,maglia:'#e67e22',pantaloni:'#2c3e50',taglia:1.1,pot:1.25,vel:0.85,dif:1.15,spec:{nome:'Pacco Express',em:'📦'},fin:{nome:'Colpo del Sole',tipo:'sole',em:'☀️'},frase:'Consegnato. Firma qui.',foto:'volti/ritagli/francesco.png',fv:-1},
+ {id:'alessandra',nome:'Alessandra',sopr:'',reparto:'Bros Manifatture',pelle:'#f1c27d',capelli:'#8e2a1b',taglio:'lunghi',barba:null,occhiali:false,maglia:'#e84393',pantaloni:'#1e272e',taglia:0.96,pot:0.95,vel:1.15,dif:0.95,spec:{nome:'Post Virale',em:'📣'},fin:{nome:'Lancio del Mouse',tipo:'obj',obj:'mouse',em:'🖱️'},frase:'Ti ho appena trasformato in un meme.',foto:'volti/scontornati/alessandra.png',fv:1,viso:[0.613,0.426,0.414,0.633]},
+ {id:'mattia',nome:'Mattia',sopr:'',reparto:'Bros Manifatture',pelle:'#ffdbac',capelli:'#1b1b1b',taglio:'cresta',barba:null,occhiali:false,maglia:'#d63031',pantaloni:'#222222',taglia:1.0,pot:1.0,vel:1.1,dif:0.95,spec:{nome:'Pennellata Vettoriale',em:'🖌️'},fin:{nome:'Thomas Breakdance',tipo:'thomas',em:'🕺'},frase:'Ti ho scontornato.',foto:'volti/scontornati/mattia.png',fv:-1,viso:[0.432,0.542,0.648,0.866]},
+ {id:'francesco',nome:'Francesco',sopr:'',reparto:'Bros Manifatture',pelle:'#e0ac69',capelli:'#2b1b0e',taglio:'calvo',barba:'barba',occhiali:false,maglia:'#e67e22',pantaloni:'#2c3e50',taglia:1.1,pot:1.25,vel:0.85,dif:1.15,spec:{nome:'Pacco Express',em:'📦'},fin:{nome:'Colpo del Sole',tipo:'sole',em:'☀️'},frase:'Consegnato. Firma qui.',foto:'volti/scontornati/francesco.png',fv:-1,viso:[0.5,0.45,0.832,0.866]},
  {id:'paolo',nome:'Paolo',sopr:'',reparto:'Bros Manifatture',pelle:'#e8b98a',capelli:'#7f8c8d',taglio:'corti',barba:null,occhiali:true,maglia:'#0984e3',pantaloni:'#2d3436',taglia:1.05,pot:1.2,vel:0.9,dif:1.05,spec:{nome:'Chiave Inglese',em:'🔧'},fin:{nome:'Lancio del PC',tipo:'obj',obj:'pc',em:'🖥️'},frase:'Fatto a mano, come le botte.',foto:null},
  {id:'massi',nome:'Massi',sopr:'',reparto:'Bros Manifatture',pelle:'#c68642',capelli:'#1a1a1a',taglio:'calvo',barba:null,occhiali:false,maglia:'#f1c40f',pantaloni:'#34495e',taglia:1.08,pot:1.15,vel:0.95,dif:1.1,spec:{nome:'Bancale Volante',em:'🚚'},fin:{nome:'Lancio della Sedia',tipo:'obj',obj:'chair',em:'🪑'},frase:'Pratica chiusa.',foto:null},
  {id:'sabina',nome:'Sabina',sopr:'',reparto:'Bros Manifatture',pelle:'#f5d0a9',capelli:'#151515',taglio:'caschetto',barba:null,occhiali:true,maglia:'#6c5ce7',pantaloni:'#2d3436',taglia:0.95,pot:1.05,vel:1.0,dif:1.05,spec:{nome:'Fattura Scaduta',em:'🧾'},fin:{nome:'Bottiglie di Vino',tipo:'multi',obj:'wine',n:3,em:'🍷'},frase:'Questa te la metto a bilancio.',foto:null},
@@ -536,11 +536,11 @@ function drawHead(d,x,y,R,fc,mouth='smile',brow=0,ko=false){
  const img=d.img&&d.img.complete&&d.img.naturalWidth?d.img:null;
  ctx.lineCap='round';ctx.lineJoin='round';
  if(img){
-  // foto di profilo già ritagliata a ovale: girata dalla parte in cui guarda il lottatore
-  const S=R*3,flip=fc*(d.fv||1)<0;
-  ctx.save();ctx.translate(x,y);if(flip)ctx.scale(-1,1);
+  // testa scontornata agganciata al collo, girata dalla parte in cui guarda il lottatore
+  const p=photoGeom(d,R),flip=fc*(d.fv||1)<0;
+  ctx.save();ctx.translate(x+p.x*fc,y-p.y);if(flip)ctx.scale(-1,1);
   if(ko)ctx.globalAlpha*=0.7;
-  ctx.drawImage(img,-S/2,-S/2,S,S);ctx.restore();
+  ctx.drawImage(img,-p.cw/2,-p.ch/2,p.cw,p.ch);ctx.restore();
   return;
  }
  const hc=d.capelli;
@@ -1030,18 +1030,26 @@ function buildObj(type){
  bake(o,new T.MeshLambertMaterial({vertexColors:true}));
  return o;
 }
-/* volto vero: la foto di profilo ritagliata prende il posto della testa, sempre rivolta alla
-   telecamera come una sagoma di cartone. Da file locale (file://) WebGL non può usare la foto:
-   lì resta la testa disegnata, online (GitHub Pages) si vede la foto. */
+/* volto vero: la testa scontornata è una sagoma fissata al collo del pupazzo, che si inclina,
+   gira e cade con lui. Il mento della foto va sul collo; la misura viene dalla distanza
+   tra cima della testa e mento (campo viso del ROSTER). Il lato dietro della sagoma mostra la
+   foto specchiata, quindi il viso guarda sempre dalla parte del lottatore.
+   Da file locale (file://) WebGL non può usare la foto: lì resta la testa disegnata. */
+function photoGeom(d,R){
+ const img=d.img,v=d.viso||[0.5,0.5,0.8,0.85],fv=d.fv||1;
+ const ch=R*2.35/v[3],cw=ch*img.naturalWidth/img.naturalHeight;
+ return{ch,cw,fv,x:-(v[0]-0.5)*cw*fv+R*0.12,y:-R*0.95+(v[3]-0.5)*ch};
+}
 function photoFace(m){
  const d=m.d,img=d.img;
  if(m.photo||m.noPhoto||!img||!img.complete||!img.naturalWidth)return;
  if(location.protocol==='file:'&&!window.__fotoLocali){m.noPhoto=true;return}
  const tex=new THREE.Texture(img);tex.needsUpdate=true;
- const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true}));
- sp.scale.set(m.R*3,m.R*3,1);
+ const p=photoGeom(d,m.R);
+ const card=new THREE.Mesh(G3.g.plane,new THREE.MeshBasicMaterial({map:tex,alphaTest:0.45,side:THREE.DoubleSide}));
+ card.scale.set(p.cw*p.fv,p.ch,1);card.position.set(p.x,p.y,0);
  for(const c of m.head.children)c.visible=false;
- m.head.add(sp);m.photo=sp;m.photoTex=tex;
+ m.head.add(card);m.photo=card;m.photoTex=tex;
 }
 function poseModel(m,f){
  const P=pose(f),u=m.u,zs=f.facing>0?1:-1;
@@ -1072,11 +1080,7 @@ function poseModel(m,f){
   const ext=e*190*u;fp.beard.scale.x=R*0.8+ext;fp.beard.position.x=R*0.22+ext;
  }
  photoFace(m);
- if(m.photo){
-  const flip=f.facing*(m.d.fv||1)<0,t=m.photoTex;t.repeat.x=flip?-1:1;t.offset.x=flip?1:0;
-  m.photo.material.rotation=-f.facing*(P.lean*1.25+P.rot);
-  m.photo.material.color.setHex(f.flash>0?0xffffff:P.ko?0x999999:0xffffff);
- }
+ if(m.photo)m.photo.material.color.setHex(f.flash>0?0xffffff:P.ko?0x9a9a9a:0xeeeeee);
  const fl=f.flash>0;
  if(fl!==m.flashOn){m.flashOn=fl;for(const mt of m.mats)mt.emissive.setHex(fl?0x888888:0x000000)}
 }
