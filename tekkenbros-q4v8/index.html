@@ -41,9 +41,9 @@ canvas{display:block;position:absolute;left:0;top:0}
    Il volto prende il posto della testa disegnata.
    ===================================================================== */
 const ROSTER=[
- {id:'alessandra',nome:'Alessandra',sopr:'',reparto:'Bros Manifatture',pelle:'#f1c27d',capelli:'#8e2a1b',taglio:'lunghi',barba:null,occhiali:false,maglia:'#e84393',pantaloni:'#1e272e',taglia:0.96,pot:0.95,vel:1.15,dif:0.95,spec:{nome:'Post Virale',em:'📣'},fin:{nome:'Lancio del Mouse',tipo:'obj',obj:'mouse',em:'🖱️'},frase:'Ti ho appena trasformato in un meme.',foto:null},
- {id:'mattia',nome:'Mattia',sopr:'',reparto:'Bros Manifatture',pelle:'#ffdbac',capelli:'#1b1b1b',taglio:'cresta',barba:null,occhiali:false,maglia:'#d63031',pantaloni:'#222222',taglia:1.0,pot:1.0,vel:1.1,dif:0.95,spec:{nome:'Pennellata Vettoriale',em:'🖌️'},fin:{nome:'Thomas Breakdance',tipo:'thomas',em:'🕺'},frase:'Ti ho scontornato.',foto:null},
- {id:'francesco',nome:'Francesco',sopr:'',reparto:'Bros Manifatture',pelle:'#e0ac69',capelli:'#2b1b0e',taglio:'calvo',barba:'barba',occhiali:false,maglia:'#e67e22',pantaloni:'#2c3e50',taglia:1.1,pot:1.25,vel:0.85,dif:1.15,spec:{nome:'Pacco Express',em:'📦'},fin:{nome:'Colpo del Sole',tipo:'sole',em:'☀️'},frase:'Consegnato. Firma qui.',foto:null},
+ {id:'alessandra',nome:'Alessandra',sopr:'',reparto:'Bros Manifatture',pelle:'#f1c27d',capelli:'#8e2a1b',taglio:'lunghi',barba:null,occhiali:false,maglia:'#e84393',pantaloni:'#1e272e',taglia:0.96,pot:0.95,vel:1.15,dif:0.95,spec:{nome:'Post Virale',em:'📣'},fin:{nome:'Lancio del Mouse',tipo:'obj',obj:'mouse',em:'🖱️'},frase:'Ti ho appena trasformato in un meme.',foto:'volti/ritagli/alessandra.png',fv:1},
+ {id:'mattia',nome:'Mattia',sopr:'',reparto:'Bros Manifatture',pelle:'#ffdbac',capelli:'#1b1b1b',taglio:'cresta',barba:null,occhiali:false,maglia:'#d63031',pantaloni:'#222222',taglia:1.0,pot:1.0,vel:1.1,dif:0.95,spec:{nome:'Pennellata Vettoriale',em:'🖌️'},fin:{nome:'Thomas Breakdance',tipo:'thomas',em:'🕺'},frase:'Ti ho scontornato.',foto:'volti/ritagli/mattia.png',fv:-1},
+ {id:'francesco',nome:'Francesco',sopr:'',reparto:'Bros Manifatture',pelle:'#e0ac69',capelli:'#2b1b0e',taglio:'calvo',barba:'barba',occhiali:false,maglia:'#e67e22',pantaloni:'#2c3e50',taglia:1.1,pot:1.25,vel:0.85,dif:1.15,spec:{nome:'Pacco Express',em:'📦'},fin:{nome:'Colpo del Sole',tipo:'sole',em:'☀️'},frase:'Consegnato. Firma qui.',foto:'volti/ritagli/francesco.png',fv:-1},
  {id:'paolo',nome:'Paolo',sopr:'',reparto:'Bros Manifatture',pelle:'#e8b98a',capelli:'#7f8c8d',taglio:'corti',barba:null,occhiali:true,maglia:'#0984e3',pantaloni:'#2d3436',taglia:1.05,pot:1.2,vel:0.9,dif:1.05,spec:{nome:'Chiave Inglese',em:'🔧'},fin:{nome:'Lancio del PC',tipo:'obj',obj:'pc',em:'🖥️'},frase:'Fatto a mano, come le botte.',foto:null},
  {id:'massi',nome:'Massi',sopr:'',reparto:'Bros Manifatture',pelle:'#c68642',capelli:'#1a1a1a',taglio:'calvo',barba:null,occhiali:false,maglia:'#f1c40f',pantaloni:'#34495e',taglia:1.08,pot:1.15,vel:0.95,dif:1.1,spec:{nome:'Bancale Volante',em:'🚚'},fin:{nome:'Lancio della Sedia',tipo:'obj',obj:'chair',em:'🪑'},frase:'Pratica chiusa.',foto:null},
  {id:'sabina',nome:'Sabina',sopr:'',reparto:'Bros Manifatture',pelle:'#f5d0a9',capelli:'#151515',taglio:'caschetto',barba:null,occhiali:true,maglia:'#6c5ce7',pantaloni:'#2d3436',taglia:0.95,pot:1.05,vel:1.0,dif:1.05,spec:{nome:'Fattura Scaduta',em:'🧾'},fin:{nome:'Bottiglie di Vino',tipo:'multi',obj:'wine',n:3,em:'🍷'},frase:'Questa te la metto a bilancio.',foto:null},
@@ -98,14 +98,13 @@ function layoutTouch(){
  }
 }
 function placeButtons(cx,cy,br){
- // a croce: PUGNO grande al centro, gli altri quattro attorno
- const d=br*1.75,r=br*0.72;
+ // quattro tasti a rombo; la parata si fa tenendo la levetta in giù
+ const d=br*1.42,r=br*0.95;
  BTN=[
-  {k:'punch',t:'PUGNO',x:cx,y:cy,r:br,col:'#ff4757'},
-  {k:'kick',t:'CALCIO',x:cx,y:cy-d,r,col:'#ffa502'},
-  {k:'up',t:'SALTO',x:cx+d,y:cy,r,col:'#2ed573'},
-  {k:'special',t:'SPECIALE',x:cx,y:cy+d,r,col:'#a55eea'},
-  {k:'down',t:'PARATA',x:cx-d,y:cy,r,col:'#1e90ff'}
+  {k:'up',t:'SALTO',x:cx,y:cy-d,r,col:'#2ed573'},
+  {k:'punch',t:'PUGNO',x:cx-d,y:cy,r,col:'#ff4757'},
+  {k:'kick',t:'CALCIO',x:cx+d,y:cy,r,col:'#ffa502'},
+  {k:'special',t:'SPECIALE',x:cx,y:cy+d,r,col:'#a55eea'}
  ];
 }
 addEventListener('resize',resize);resize();
@@ -233,7 +232,7 @@ function touchVal(k){
  if(k==='left')return id&&STICK.px<-m*0.35;
  if(k==='right')return id&&STICK.px>m*0.35;
  if(k==='up')return(id&&STICK.py<-m*0.55)||BTN.some(b=>b.k==='up'&&b.on);
- if(k==='down')return(id&&STICK.py>m*0.55)||BTN.some(b=>b.k==='down'&&b.on);
+ if(k==='down')return id&&STICK.py>m*0.55;
  if(k==='back')return PAUSEBTN.on;
  return BTN.some(b=>b.k===k&&b.on);
 }
@@ -316,9 +315,12 @@ class Fighter{
   if(this.grounded)this.vx=(this.move.step||0)*this.facing;
  }
  trySpecial(g){
+  // lo speciale è solo la mossa finale: si usa quando la barra è piena
   if(this.meter>=100){const t=this.def.fin.tipo;this.meter=0;this.startAttack(t==='thomas'||t==='barba'?t:'super');g.superStart(this);return true}
-  if(this.meter>=25){this.meter-=25;this.startAttack('special');SFX.special();return true}
-  if(!this.cpu)SFX.nope();
+  if(!this.cpu){
+   SFX.nope();
+   if(!g.parts.some(p=>p.type==='text'&&p.who===this))g.parts.push({type:'text',who:this,x:this.x,y:this.y-230*this.s,vx:0,vy:-0.6,life:50,max:50,col:'#9fd3ff',text:'BARRA NON CARICA'});
+  }
   return false;
  }
  launch(g,big){
@@ -338,7 +340,7 @@ class Fighter{
   if(this.flash>0)this.flash--;
   if(this.invul>0)this.invul--;
   if(this.bufT>0)this.bufT--;else this.buffer=null;
-  if(this.state!=='ko')this.meter=Math.min(100,this.meter+0.03);
+  if(this.state!=='ko')this.meter=Math.min(100,this.meter+0.05);
   this.shownHp=Math.max(this.hp,this.shownHp-0.45);
   switch(this.state){
    case 'idle':case 'walk':case 'guard':{
@@ -434,13 +436,11 @@ class CPU{
    const ft=f.def.fin.tipo,finOk=ft==='thomas'?dist<140:ft==='barba'?dist>90&&dist<360:dist>170;
    if(f.meter>=100&&finOk&&r<0.5+L*0.3)this.queue=['special'];
    else if(dist>330){
-    if(f.meter>=25&&f.meter<100&&r<0.25+L*0.15)this.queue=['special'];
-    else if(Math.random()<0.1)this.plan='jumpin';
+    if(Math.random()<0.1)this.plan='jumpin';
     else{this.plan='app';this.planT=20+Math.random()*30}
    }else if(dist>115){
     if(r<0.65){this.plan='app';this.planT=15+Math.random()*20}
     else if(r<0.8){this.plan='ret';this.planT=15}
-    else if(f.meter>=25&&f.meter<100&&r<0.9)this.queue=['special'];
     else this.plan='jumpin';
    }else{
     if(r<0.42)this.queue=['punch'];
@@ -536,11 +536,11 @@ function drawHead(d,x,y,R,fc,mouth='smile',brow=0,ko=false){
  const img=d.img&&d.img.complete&&d.img.naturalWidth?d.img:null;
  ctx.lineCap='round';ctx.lineJoin='round';
  if(img){
-  ctx.fillStyle=OUT;circle(x,y,R+3);
-  ctx.save();ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.clip();
-  const iw=img.naturalWidth,ih=img.naturalHeight,sc=Math.max(2*R/iw,2*R/ih);
-  ctx.drawImage(img,x-iw*sc/2,y-ih*sc/2,iw*sc,ih*sc);ctx.restore();
-  if(ko){ctx.fillStyle='rgba(0,0,0,0.35)';circle(x,y,R)}
+  // foto di profilo già ritagliata a ovale: girata dalla parte in cui guarda il lottatore
+  const S=R*3,flip=fc*(d.fv||1)<0;
+  ctx.save();ctx.translate(x,y);if(flip)ctx.scale(-1,1);
+  if(ko)ctx.globalAlpha*=0.7;
+  ctx.drawImage(img,-S/2,-S/2,S,S);ctx.restore();
   return;
  }
  const hc=d.capelli;
@@ -1030,18 +1030,18 @@ function buildObj(type){
  bake(o,new T.MeshLambertMaterial({vertexColors:true}));
  return o;
 }
+/* volto vero: la foto di profilo ritagliata prende il posto della testa, sempre rivolta alla
+   telecamera come una sagoma di cartone. Da file locale (file://) WebGL non può usare la foto:
+   lì resta la testa disegnata, online (GitHub Pages) si vede la foto. */
 function photoFace(m){
  const d=m.d,img=d.img;
- if(m.photo||!img||!img.complete||!img.naturalWidth)return;
- const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');
- x.beginPath();x.arc(128,128,124,0,Math.PI*2);x.clip();
- const iw=img.naturalWidth,ih=img.naturalHeight,s=Math.max(256/iw,256/ih);x.drawImage(img,128-iw*s/2,128-ih*s/2,iw*s,ih*s);
- const geo=new THREE.SphereGeometry(1.015,24,16,Math.PI*0.5,Math.PI,Math.PI*0.12,Math.PI*0.76);
- const pos=geo.attributes.position,uv=geo.attributes.uv;
- for(let i=0;i<pos.count;i++)uv.setXY(i,0.5-pos.getZ(i)/1.9,0.5+pos.getY(i)/1.9);
- uv.needsUpdate=true;
- const R=m.R;m.photo=M(geo,new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true}),R,R*1.04,R*0.96);
- m.head.add(m.photo);m.face.face.visible=false;
+ if(m.photo||m.noPhoto||!img||!img.complete||!img.naturalWidth)return;
+ if(location.protocol==='file:'&&!window.__fotoLocali){m.noPhoto=true;return}
+ const tex=new THREE.Texture(img);tex.needsUpdate=true;
+ const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true}));
+ sp.scale.set(m.R*3,m.R*3,1);
+ for(const c of m.head.children)c.visible=false;
+ m.head.add(sp);m.photo=sp;m.photoTex=tex;
 }
 function poseModel(m,f){
  const P=pose(f),u=m.u,zs=f.facing>0?1:-1;
@@ -1072,6 +1072,11 @@ function poseModel(m,f){
   const ext=e*190*u;fp.beard.scale.x=R*0.8+ext;fp.beard.position.x=R*0.22+ext;
  }
  photoFace(m);
+ if(m.photo){
+  const flip=f.facing*(m.d.fv||1)<0,t=m.photoTex;t.repeat.x=flip?-1:1;t.offset.x=flip?1:0;
+  m.photo.material.rotation=-f.facing*(P.lean*1.25+P.rot);
+  m.photo.material.color.setHex(f.flash>0?0xffffff:P.ko?0x999999:0xffffff);
+ }
  const fl=f.flash>0;
  if(fl!==m.flashOn){m.flashOn=fl;for(const mt of m.mats)mt.emissive.setHex(fl?0x888888:0x000000)}
 }
@@ -1831,10 +1836,10 @@ function drawLobby(){
 function drawControls(){
  bgFX('#06202a','#000',T);
  txt('COMANDI',W/2,60,54,'#fff','center',FONT,6);
- const rows=[['','GIOCATORE 1','GIOCATORE 2','JOYPAD'],['Muoversi','A  D','←  →','croce / levetta'],['Salto','W','↑','su'],['Parata','S (tieni)','↓ (tieni)','giù'],['Pugno','F',',  oppure  1 tastierino','A / X'],['Calcio','G','.  oppure  2 tastierino','B / Y'],['Speciale','H','-  oppure  3 tastierino','dorsali'],['Pausa','ESC','ESC','Select']];
+ const rows=[['','GIOCATORE 1','GIOCATORE 2','JOYPAD'],['Muoversi','A  D','←  →','croce / levetta'],['Salto','W','↑','su'],['Parata','S (tieni)','↓ (tieni)','giù'],['Pugno','F',',  oppure  1 tastierino','A / X'],['Calcio','G','.  oppure  2 tastierino','B / Y'],['Mossa finale','H','-  oppure  3 tastierino','dorsali'],['Pausa','ESC','ESC','Select']];
  const xs=[200,470,780,1070];
  rows.forEach((r,j)=>{const y=140+j*48;if(j===0)ctx.fillStyle='rgba(255,255,255,0.12)',ctx.fillRect(80,y-22,1120,44);r.forEach((c,i)=>txt(c,xs[i],y,j===0?22:24,j===0?'#ffd32a':i===0?'#9fd3ff':'#fff','center',j===0||i===0?FONT:FONT2))});
- const tips=['Ogni colpo vale da solo: niente combo, conta il tempismo','SPECIALE: costa una tacca della barra (25%) e lancia il tuo oggetto','MOSSA FINALE: con la barra piena, lo speciale lancia un pezzo d\'ufficio (monitor, sedia, tastiera...)','La parata ferma i colpi solo davanti: alle spalle si prende tutto','Calcio in salto e pugno in salto per entrare dall\'alto'];
+ const tips=['Ogni colpo vale da solo: niente combo, conta il tempismo','La barra in basso si carica col tempo, colpendo e prendendo colpi','Quando è piena premi SPECIALE: parte la MOSSA FINALE del tuo personaggio','Sul telefono: SALTO, PUGNO, CALCIO, SPECIALE; per parare tieni la levetta in giù','La parata ferma i colpi solo davanti: alle spalle si prende tutto'];
  tips.forEach((t,i)=>txt('▸ '+t,120,540+i*30,20,'#fff','left',FONT2));
  txt('INVIO / ESC per tornare',W/2,700,16,'rgba(255,255,255,0.5)','center',FONT2);
 }
@@ -1850,9 +1855,8 @@ function infoPanel(d,x,align,col){
  txt(d.reparto.toUpperCase(),tx,236,18,'#aaa',align,FONT2);
  const bx=L?x:x-194;
  statBar(bx,272,'POT',d.pot,'#ff6b6b');statBar(bx,296,'VEL',d.vel,'#feca57');statBar(bx,320,'DIF',d.dif,'#48dbfb');
- ctx.font=`26px ${EMOJI}`;ctx.textAlign=L?'left':'right';ctx.fillText(d.spec.em,L?x:x,356);
- txt(d.spec.nome,L?x+36:x-36,356,18,'#fff',align,FONT2);
- txt('FINALE: '+d.fin.nome,x,382,16,'#ffd32a',align,FONT2);
+ txt('MOSSA FINALE',x,350,15,'#ffd32a',align,FONT,3);
+ txt(d.fin.nome,x,374,20,'#fff',align,FONT2);
 }
 function drawSelect(){
  const S=SEL;
@@ -1966,8 +1970,8 @@ function meterBar(x,y,w,f,mir){
  const full=f.meter>=100;
  ctx.fillStyle=full?`hsl(${(T*8)%360},90%,60%)`:'#48dbfb';
  const mw=w*f.meter/100;ctx.fillRect(mir?x+w-mw:x,y,mw,12);
- ctx.fillStyle='rgba(0,0,0,0.6)';for(let i=1;i<4;i++)ctx.fillRect(x+w*i/4-1,y,2,12);
- if(full)txt('FINALE!',mir?x+w-4:x+4,y-14,20,'#fff',mir?'right':'left',FONT,4);
+ if(full&&(T>>3)%2)txt('MOSSA FINALE PRONTA',mir?x+w-4:x+4,y-14,20,'#ffd32a',mir?'right':'left',FONT,4);
+ else if(!full)txt('MOSSA FINALE',mir?x+w-4:x+4,y-14,14,'rgba(255,255,255,0.6)',mir?'right':'left',FONT,3);
 }
 function hudDuel(){
  const [a,b]=F.fighters;
@@ -2026,6 +2030,7 @@ function drawFight(){
  for(const p of F.parts){
   const a=p.life/p.max,s=at(p.x,p.y);ctx.globalAlpha=Math.max(0,a);
   if(p.type==='ring'){ctx.strokeStyle=p.col;ctx.lineWidth=4*a;ctx.beginPath();ctx.arc(s.x,s.y,(p.size*(1-a)+8)*k,0,Math.PI*2);ctx.stroke()}
+  else if(p.type==='text'&&p.who){txt(p.text,s.x,s.y,22,p.col,'center',FONT,4)}
   else if(p.type==='text'){ctx.save();ctx.translate(s.x,s.y);ctx.rotate(-0.15);txt(p.text,0,0,(40+(1-a)*10)*Math.max(0.7,k),p.col,'center',FONT,6);ctx.restore()}
   else{ctx.fillStyle=p.col;circle(s.x,s.y,p.size*k*(p.type==='dust'?(1.5-a):a+0.3))}
  }
@@ -2127,8 +2132,15 @@ function drawTouch(){
  tctx.fillStyle='#ff4757';tctx.beginPath();tctx.arc(S.x+S.px,S.y+S.py,S.r*0.42,0,Math.PI*2);tctx.fill();
  tctx.strokeStyle='#fff';tctx.stroke();
  tctx.textAlign='center';tctx.textBaseline='middle';
+ // SPECIALE si accende quando la barra del giocatore è piena
+ const me=scene==='fight'&&F?F.fighters.find(f=>f.slot===myIdx()):null,ready=me&&me.alive&&me.meter>=100;
  for(const b of BTN){
-  tctx.globalAlpha=a*(b.on?1:0.85);
+  if(b.k==='special'&&ready){
+   const pr=b.r*(1.25+0.12*Math.sin(T*0.25));tctx.globalAlpha=1;
+   const gl=tctx.createRadialGradient(b.x,b.y,b.r*0.6,b.x,b.y,pr);gl.addColorStop(0,'rgba(255,211,42,0.9)');gl.addColorStop(1,'rgba(255,211,42,0)');
+   tctx.fillStyle=gl;tctx.beginPath();tctx.arc(b.x,b.y,pr,0,Math.PI*2);tctx.fill();
+  }
+  tctx.globalAlpha=b.k==='special'&&!ready&&scene==='fight'?a*0.45:a*(b.on?1:0.85);
   tctx.fillStyle=b.on?'#fff':b.col;tctx.beginPath();tctx.arc(b.x,b.y,b.r*(b.on?0.94:1),0,Math.PI*2);tctx.fill();
   tctx.strokeStyle='rgba(0,0,0,0.5)';tctx.lineWidth=Math.max(2,b.r*0.06);tctx.stroke();
   tctx.fillStyle=b.on?b.col:'#fff';tctx.font=`${Math.round(b.r*(b.t.length>6?0.32:0.38))}px ${FONT}`;tctx.fillText(b.t,b.x,b.y);
