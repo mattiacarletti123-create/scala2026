@@ -786,8 +786,8 @@ const STAGES=[
   for(let i=-7;i<=7;i++){c.beginPath();c.moveTo(W/2+i*95,598);c.lineTo(W/2+i*240,H);c.stroke()}
  }},
  // scenari dalle foto della sede (Montegiorgio): in alto la foto, sotto il pavimento
- {nome:'Atrio di Vetro',foto:'ambientazioni/gioco/atrio.jpg',pav:'#8a8e93',alto:10,draw(c){fotoStage(c,this)}},
- {nome:'Cortile Interno',foto:'ambientazioni/gioco/cortile.jpg',pav:'#3e6a47',draw(c){fotoStage(c,this)}}
+ {nome:'Atrio di Vetro',foto:'ambientazioni/gioco/atrio.jpg',pav:'#8a8e93',alto:10,camX:9.5,draw(c){fotoStage(c,this)}},
+ {nome:'Cortile Interno',foto:'ambientazioni/gioco/cortile.jpg',pav:'#3e6a47',camX:7.4,draw(c){fotoStage(c,this)}}
 ];
 for(const st of STAGES)if(st.foto){st.img=new Image();st.img.src=st.foto;st.img.onload=()=>{st.cv=null}}
 function fotoStage(c,st){
@@ -1141,7 +1141,8 @@ function buildStage(i){
  const T=THREE,g=G3.g,o=new T.Group();
  const add=(mesh,x,y,z)=>{mesh.position.set(x,y,z);o.add(mesh);return mesh};
  const st=STAGES[i];
- if(st.img){
+ if(i===4||i===5){(i===4?buildAtrio:buildCortile)(o,add)}
+ else if(st.img){
   // foto vera della sede come fondale; ai lati due copie specchiate per coprire tutta la larghezza
   const tex=new T.Texture(st.img);
   const ok=()=>{tex.needsUpdate=true};if(st.img.complete&&st.img.naturalWidth)ok();else st.img.addEventListener('load',ok);
@@ -1205,6 +1206,59 @@ function buildStage(i){
  bake(o,new T.MeshLambertMaterial({vertexColors:true}),x=>x.material.type==='MeshLambertMaterial'&&!x.material.map);
  return o;
 }
+/* ---------- la sede in 3D: spazi ricostruiti dalle foto, con i pezzi veri delle foto sulle superfici ---------- */
+function fotoTex(src){
+ const img=new Image(),t=new THREE.Texture(img);
+ img.onload=()=>{t.needsUpdate=true};img.src=src;return t;
+}
+function buildAtrio(o,add){
+ const T=THREE,g=G3.g,white=lm('#ecebe8'),grey=lm('#d6d5d1'),dark=lm('#2f2a27'),slot=lm('#1d1d1f');
+ // cilindro di vetro: la foto vera sulla metà rivolta verso di noi
+ const R=4.3,Hc=4.7,cx=-1.2,cz=-8.6;
+ const geo=new T.CylinderGeometry(R,R,Hc,48,1,true,-Math.PI/2,Math.PI);
+ const pos=geo.attributes.position,uv=geo.attributes.uv;
+ for(let k=0;k<pos.count;k++)uv.setX(k,(pos.getX(k)/R+1)/2); // la foto è in prospettiva: u segue la x, non l'angolo
+ uv.needsUpdate=true;
+ add(new T.Mesh(geo,new T.MeshBasicMaterial({map:fotoTex('ambientazioni/gioco/atrio-cilindro.jpg')})),cx,Hc/2,cz);
+ add(M(g.cyl,white,R+0.18,0.14,R+0.18),cx,0.07,cz);
+ add(M(g.cyl,white,R+0.12,0.55,R+0.12),cx,Hc+0.27,cz);
+ // soffitto bianco con faretti e tagli di luce
+ const ceil=add(M(g.plane,white,60,30,1),0,5.2,-1);ceil.rotation.x=Math.PI/2;
+ const lamp=new T.MeshBasicMaterial({color:0xfffbe8});
+ for(let x=-14;x<=14;x+=3.5)for(let z=-11;z<=6;z+=4.2)add(M(g.box,lamp,0.18,0.02,0.18),x+((z*7)%2),5.18,z);
+ for(const z of[-3,2])add(M(g.box,slot,9,0.02,0.06),-6,5.17,z);
+ // pareti di fondo e corridoio a destra
+ add(M(g.box,white,40,5.2,0.2),0,2.6,-14);
+ add(M(g.box,white,0.25,5.2,26),11,2.6,-1);
+ add(M(g.box,grey,0.9,5.2,0.9),5.6,2.6,-7.5);add(M(g.box,grey,0.9,5.2,0.9),9.2,2.6,-10.5);
+ add(M(g.box,white,4,0.6,26),9,4.9,-1);
+ // armadi scuri con ante chiare, come nella foto
+ for(const [x,z] of[[7.6,-4.2],[7.6,-2.6]]){add(M(g.box,dark,0.55,1.8,1.5),x,0.9,z);add(M(g.box,lm('#cfcac2'),0.02,0.55,1.2),x-0.28,1.25,z)}
+ // vetrate luminose sul lato sinistro
+ const sky=new T.MeshBasicMaterial({color:0xdfe9ef});
+ add(M(g.box,sky,0.1,3.8,22),-13,2.4,-2);
+ for(let z=-12;z<=9;z+=2.2)add(M(g.box,slot,0.15,3.9,0.08),-12.9,2.4,z);
+}
+function buildCortile(o,add){
+ const T=THREE,g=G3.g,white=lm('#eef0f2'),frame=lm('#1b1d20');
+ const vetro=fotoTex('ambientazioni/gioco/cortile-vetrata.jpg'),ponte=fotoTex('ambientazioni/gioco/cortile-ponte.jpg');
+ const vm=new T.MeshBasicMaterial({map:vetro,side:T.DoubleSide});
+ const H1=4.4,L=8.6,back=-9;
+ // vetrata di fondo, sotto il ponte
+ add(M(g.plane,vm,2*L,H1,1),0,H1/2,back);
+ // pareti laterali di vetro su due piani, dal fondo fino dietro la telecamera
+ for(const sx of[-1,1])for(let z=back+8;z<16;z+=16)for(const fl of[0,1]){
+  const p=add(M(g.plane,vm,16,H1,1),sx*L,H1/2+fl*H1,z);p.rotation.y=-sx*Math.PI/2;
+ }
+ for(const sx of[-1,1]){add(M(g.box,frame,0.12,0.12,30),sx*L,0.06,3);add(M(g.box,white,0.4,0.35,30),sx*L,H1,3);add(M(g.box,frame,0.12,0.12,30),sx*L,2*H1,3)}
+ // il ponte vetrato che attraversa il cortile in alto, con la foto vera sulla facciata
+ const pw=2*L,ph=3.3,py=H1+ph/2+0.25,pz=back+0.5;
+ const pm=[white,white,white,lm('#5d6066'),new T.MeshBasicMaterial({map:ponte}),white];
+ add(new T.Mesh(g.box,pm),0,py,pz).scale.set(pw,ph,3);
+ add(M(g.box,lm('#3a3d42'),pw,0.25,3.2),0,H1+0.12,pz);
+ // cielo e ringhiera di vetro in cima
+ add(M(g.box,new T.MeshPhongMaterial({color:0xcfe6ff,transparent:true,opacity:0.25}),pw,0.9,0.05),0,py+ph/2+0.45,pz+1.5);
+}
 function setStage(i){
  if(G3.curStage===i)return;
  if(G3.stageObj)G3.fight.remove(G3.stageObj);
@@ -1255,6 +1309,8 @@ function render3DFight(){
  G3.cx=lerp(G3.cx,tx,0.08);G3.cd=lerp(G3.cd,td,0.06);G3.co=lerp(G3.co,orbit,0.06);
  const sh=F.shake*0.012,cam=G3.cam;
  cam.position.set(G3.cx+Math.sin(G3.co)*G3.cd+rnd(-sh,sh),1.15+G3.cd*0.14+rnd(-sh,sh),Math.cos(G3.co)*G3.cd);
+ // negli spazi chiusi della sede la telecamera resta dentro le pareti
+ const lim=STAGES[F.cfg.stage].camX;if(lim)cam.position.x=clamp(cam.position.x,-lim,lim);
  cam.lookAt(G3.cx,1.0,0);
  G3.r.render(G3.fight,cam);
  const a=proj(640+G3.cx*100,GROUND-100),b=proj(740+G3.cx*100,GROUND-100);G3.k=Math.max(0.2,(b.x-a.x)/100);
